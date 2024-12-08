@@ -11,8 +11,6 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-//console.log(process.env.MONGODB);
-
 app.use(express.json());
 app.use(
     express.urlencoded({
@@ -21,16 +19,18 @@ app.use(
 );
 app.use(cors());
 
-console.log(process.env.MONGO_URI2);
+console.log(process.env.MONGO_URI3);
 
-
+const uri = process.env.MONGO_URI3
+console.log('uri :>> ', uri);
 mongoose
-    .connect(process.env.MONGO_URI2)
+    //.connect(process.env.MONGO_URI2)
+    .connect("mongodb+srv://artprojectmongodb:litY8ebIdZ3twYBW@cluster0.qol7m.mongodb.net/sample_mflix?retryWrites=true&w=majority&appName=Cluster0")
     .then(() => console.log("Connection to Mongo DB established"))
-    .catch((err) => console.log(err));
+    .catch((err) => console.log("ERROR FROM CATCH " + err));
 
 app.listen(port, () => {
-    console.log(`Server is running on ${port} portt`.bgBlue);
+    console.log(`Server is running on ${port} port`.bgBlue);
 });
 
 app.use("/api", testRouter);

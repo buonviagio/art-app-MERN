@@ -1,0 +1,46 @@
+/* Убираем отступы */
+body,
+html {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  /* overflow: hidden;
+  height: 100%; */
+}
+
+/* Background */
+.main-conteiner-home-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, #ff7eb3, #ff758c, #ffeb3b, #83eaf1);
+  background-size: 400% 400%;
+  animation: gradient 10s infinite;
+}
+
+/* Animation for gradient */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Title  */
+.title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  /* font-family: Arial, sans-serif; */
+  font-size: 3rem;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
