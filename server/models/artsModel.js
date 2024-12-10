@@ -21,7 +21,8 @@ const artsSchema = new mongoose.Schema({
     },
     picture: {
         type: Object
-    }
+    },
+    userWhoPostedArt: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 })
 
 const ArtsModel = mongoose.model("Art", artsSchema);
