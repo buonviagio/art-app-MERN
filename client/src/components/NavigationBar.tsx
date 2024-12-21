@@ -1,3 +1,4 @@
+import { NavLink } from "react-router";
 import "./NavigationBar.css";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 
@@ -6,10 +7,10 @@ export default function NavigationBar() {
     <nav className="navigation-bar-container">
       <ul className="navigation-bar-table">
         <li>
-          <a href="#">Home</a>
+          <NavLink to="/">Home</NavLink>
         </li>
         <li>
-          <a href="#">Sign In/Up</a>
+          <NavLink to="/register">Sign In/Up</NavLink>
         </li>
         <li>
           <a href="#">Profile</a>

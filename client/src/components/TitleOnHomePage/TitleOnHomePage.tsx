@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
-import NavigationBar from "../components/NavigationBar";
-import "./HomePage.css";
-import RegisterPage from "./registration/RegisterPage";
+import React, { useEffect, useState } from "react";
 
-export default function HomePage() {
+export default function TitleOnHomePage() {
   const [text, setText] = useState("");
   const [index, setIndex] = useState(0);
   const titleString = "Welcome to Art!";
@@ -19,11 +16,5 @@ export default function HomePage() {
       return () => clearTimeout(timeot);
     }
   }, [index]);
-
-  return (
-    <div className="main-conteiner-home-page">
-      <NavigationBar />
-      <h1 className="title">{text}</h1>
-    </div>
-  );
+  return <h1 className="title">{text}</h1>;
 }

@@ -13,7 +13,7 @@ const fileFilter = (req, file, cb) => {
     console.log('file :>> ', file);
     const fileExtension = path.extname(file.originalname)
 
-    if (fileExtension !== ".jpeg" && fileExtension !== ".jpg" && fileExtension !== ".png") {
+    if (fileExtension !== ".jpeg" && fileExtension !== ".jpg" && fileExtension !== ".png" && fileExtension !== ".webp") {
         console.log('file Not suported :>> ');
         // To reject this file pass `false`, like so:
         cb(null, false)
@@ -22,13 +22,8 @@ const fileFilter = (req, file, cb) => {
         // To accept the file pass `true`, like so:
         cb(null, true)
     }
-
-
-
-
     // You can always pass an error if something goes wrong:
     //cb(new Error('I don\'t have a clue!'))
-
 }
 
 

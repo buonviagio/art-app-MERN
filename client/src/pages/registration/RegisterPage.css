@@ -1,0 +1,20 @@
+.register-container {
+  border-radius: 15px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+  max-width: 90%;
+  width: 400px;
+  height: auto;
+  position: relative;
+  margin: auto;
+  margin-top: 10%;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.custom-hr {
+  border: 0;
+  border-top: 2px solid #ccc;
+  width: 80%;
+  margin: 20px auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
