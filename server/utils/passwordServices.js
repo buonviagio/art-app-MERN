@@ -13,4 +13,13 @@ const encryptPassword = async (rawPassword) => {
     }
 }
 
-export { encryptPassword }
+const isPasswordCorrect = async (rowPass, hashPassword) => {
+    const isPasswordMatch = await bcrypt.compare(rowPass, hashPassword);
+    if (isPasswordMatch) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export { encryptPassword, isPasswordCorrect }

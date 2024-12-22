@@ -5,49 +5,48 @@ import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 
 export default function LoginPage() {
   const [newUser, setNewUser] = useState<User | null>(null);
+  const [userCredentials, setUserCredentials] = useState({
+    email: "",
+    password: "",
+  });
 
-  const handleRegisterChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setNewUser({
-      ...newUser!,
-      [event.target.name]: [event.target.value],
+  const handleLoginChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setUserCredentials({
+      ...userCredentials!,
+      [event.target.name]: event.target.value,
     });
   };
 
-  const handleRegisterSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleLoginSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("newUser from handleRegisterSubmit:>> ", newUser);
+
+    console.log("userCredentials :>> ", userCredentials);
+
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
     const urlencoded = new URLSearchParams();
-    if (newUser) {
-      urlencoded.append("userName", newUser.userName);
-      urlencoded.append("email", newUser.email);
-      urlencoded.append("password", newUser.password);
-      urlencoded.append(
-        "avatar",
-        newUser.userImage
-          ? newUser.userImage
-          : "https://www.vecteezy.com/vector-art/8442080-user-icon-in-trendy-flat-style-isolated-on-white-background"
-      );
-    }
-    if (!newUser?.email) {
-      alert("email is missing");
-    }
+    urlencoded.append("email", userCredentials.email);
+    urlencoded.append("password", userCredentials.password);
 
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: urlencoded,
     };
+
     try {
-      const request = await fetch(
-        "http://localhost:5000/api/user/register",
+      const response = await fetch(
+        "http://localhost:5000/api/user/login",
         requestOptions
       );
-
-      const result = await request.json();
+      const result = await response.json();
       console.log("result :>> ", result);
+      if (result.token) {
+        //If there is a token in the response, store token
+        localStorage.setItem("token", result.token);
+        //2 Set user (probably in AuthContext with the user info)
+      }
     } catch (error) {
       console.log("error :>> ", error);
     }
@@ -57,20 +56,7 @@ export default function LoginPage() {
     <div>
       <div className="register-container">
         <h2 className="text-primary fw-bold text-center mb-4">Login</h2>
-        <Form onSubmit={handleRegisterSubmit}>
-          {/* <Row>
-            <Col>
-              <InputGroup className="mb-3 mt-3">
-                <Form.Control
-                  name="userName"
-                  placeholder="Your name"
-                  aria-describedby="inputGroup-sizing-default"
-                  onChange={handleRegisterChange}
-                  className="ms-3 me-3"
-                />
-              </InputGroup>
-            </Col>
-          </Row> */}
+        <Form onSubmit={handleLoginSubmit}>
           <Row>
             <Col>
               <InputGroup className="mb-3">
@@ -78,7 +64,8 @@ export default function LoginPage() {
                   name="email"
                   placeholder="Email"
                   aria-describedby="inputGroup-sizing-default"
-                  onChange={handleRegisterChange}
+                  value={userCredentials.email}
+                  onChange={handleLoginChange}
                   className="ms-3 me-3"
                 />
               </InputGroup>
@@ -92,7 +79,8 @@ export default function LoginPage() {
                   placeholder="Passwort"
                   aria-describedby="inputGroup-sizing-default"
                   type="password"
-                  onChange={handleRegisterChange}
+                  value={userCredentials.password}
+                  onChange={handleLoginChange}
                   className="ms-3 me-3"
                 />
               </InputGroup>

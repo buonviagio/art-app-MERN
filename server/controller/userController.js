@@ -1,7 +1,8 @@
 import UserModel from "../models/userModel.js";
 import mongoose from "mongoose";
 import { pictureUpload } from "../utils/pictureUpload.js";
-import { encryptPassword } from "../utils/passwordServices.js";
+import { encryptPassword, isPasswordCorrect } from "../utils/passwordServices.js";
+import { issueToken } from "../utils/tokenServices.js";
 
 const avatarUpload = async (req, res) => {
     console.log('req :>> ', req.file);
@@ -88,4 +89,60 @@ const register = async (req, res) => {
     }
 
 }
-export { avatarUpload, getUserWithPostedArts, register };
+
+const login = async (req, res) => {
+    const { email, password } = req.body;
+    //1 Input validation
+
+    //2 Check if user exist in our users collection
+    try {
+        const existingUser = await UserModel.findOne({ email: email });
+        //console.log('existingUser :>> ', existingUser);
+        if (!existingUser) {
+            return res.status(400).json({
+                message: "You have to register"
+            })
+        }
+        if (existingUser) {
+            //3 Check the passwor
+            const isPassOk = await isPasswordCorrect(password, existingUser.password);
+
+            console.log("isPassOk", isPassOk);
+            if (!isPassOk) {
+                return res.status(400).json({
+                    message: "Password is incorrect"
+                });
+            }
+            //4 Generate the token
+
+            if (isPassOk) {
+                const token = issueToken(existingUser._id);
+
+                if (!token) {
+                    return res.status(500).json({
+                        error: "token was not created"
+                    });
+                }
+                if (token) {
+                    //5. send to client confirm uuser login
+                    return res.status(200).json({
+                        message: "token was succesfully created",
+                        user: {
+                            userName: existingUser.userName,
+                            email: existingUser.email,
+                            avatar: existingUser.avatar
+                        },
+                        token
+                    })
+                }
+            }
+
+        }
+    } catch (error) {
+        return res.status(500).json({
+            error: error
+        })
+    }
+}
+
+export { avatarUpload, getUserWithPostedArts, register, login };
