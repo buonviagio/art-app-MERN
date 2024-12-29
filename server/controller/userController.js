@@ -145,4 +145,9 @@ const login = async (req, res) => {
     }
 }
 
-export { avatarUpload, getUserWithPostedArts, register, login };
+const getProfile = async (req, res) => {
+    console.log('req :>> ', req);
+
+}
+
+export { avatarUpload, getUserWithPostedArts, register, login, getProfile };

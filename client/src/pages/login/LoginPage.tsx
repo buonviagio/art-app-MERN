@@ -1,9 +1,11 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { User } from "../../types/customType";
+import { LoginOkResponse, User } from "../../types/customType";
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
+import useUserStatus from "../../hooks/useUserStatus";
 
 export default function LoginPage() {
+  const isUserLOGEDIN = useUserStatus();
   const [newUser, setNewUser] = useState<User | null>(null);
   const [userCredentials, setUserCredentials] = useState({
     email: "",
@@ -40,12 +42,20 @@ export default function LoginPage() {
         "http://localhost:5000/api/user/login",
         requestOptions
       );
-      const result = await response.json();
+      const result = (await response.json()) as LoginOkResponse;
       console.log("result :>> ", result);
+
       if (result.token) {
         //If there is a token in the response, store token
         localStorage.setItem("token", result.token);
         //2 Set user (probably in AuthContext with the user info)
+        // Should to set User setNewUser({result.user })
+
+        console.log("isUserLOGEDIN :>> ", isUserLOGEDIN);
+      } else {
+        throw new Error(
+          "There wasn't recieved token from the server, try login again"
+        );
       }
     } catch (error) {
       console.log("error :>> ", error);

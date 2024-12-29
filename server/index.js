@@ -1,13 +1,16 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import testRouter from "./routes/testRouter.js";
 import mongoose from "mongoose";
 import colors from "colors";
-import * as dotenv from "dotenv";
 import artsRouter from "./routes/artsRouter.js";
 import userRouter from "./routes/userRouter.js";
 import cloudinaryConfig from "./config/cloudinaryConfiguration.js";
-dotenv.config();
+import passportStrategy from "./config/passport.js";
+import passport from "passport";
+
 
 
 const app = express();
@@ -22,6 +25,8 @@ const addMiddlewares = () => {
     );
     app.use(cors());
     cloudinaryConfig();
+    passport.initialize();
+    passport.use(passportStrategy);
 }
 
 const DBConnection = async () => {
