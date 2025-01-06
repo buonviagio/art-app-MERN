@@ -1,20 +1,51 @@
 import { NavLink } from "react-router";
 import "./NavigationBar.css";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function NavigationBar() {
+  const { logout, isAuthenticated } = useContext(AuthContext);
+
+  const handleSignOut = () => {
+    logout();
+  };
+
   return (
     <nav className="navigation-bar-container">
       <ul className="navigation-bar-table">
         <li>
-          <NavLink to="/">Home</NavLink>
+          <NavLink to="/cardscontainer">Gallery</NavLink>
         </li>
-        <li>
+
+        {!isAuthenticated && (
+          <li>
+            <NavLink to="/register">Sign In/Up</NavLink>
+          </li>
+        )}
+        {isAuthenticated && (
+          <>
+            <li>
+              <NavLink to="/profile">Profile</NavLink>
+            </li>
+            <li>
+              <NavLink to="/" onClick={handleSignOut}>
+                Sign Out
+              </NavLink>
+            </li>
+          </>
+        )}
+        {/* <li>
           <NavLink to="/register">Sign In/Up</NavLink>
         </li>
         <li>
-          <a href="#">Profile</a>
+          <NavLink to="/profile">Profile</NavLink>
         </li>
+        <li>
+          <NavLink to="/" onClick={handleSignOut}>
+            Sign Out
+          </NavLink>
+        </li> */}
       </ul>
       <div className="profile-icon">
         <AccountCircle fontSize="large" sx={{ color: "#66ccff" }} />

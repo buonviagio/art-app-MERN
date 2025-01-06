@@ -1,10 +1,12 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import { LoginOkResponse, User } from "../../types/customType";
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import useUserStatus from "../../hooks/useUserStatus";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function LoginPage() {
+  const { login } = useContext(AuthContext);
   const isUserLOGEDIN = useUserStatus();
   const [newUser, setNewUser] = useState<User | null>(null);
   const [userCredentials, setUserCredentials] = useState({
@@ -47,7 +49,9 @@ export default function LoginPage() {
 
       if (result.token) {
         //If there is a token in the response, store token
-        localStorage.setItem("token", result.token);
+        //localStorage.setItem("token", result.token);
+        login(result.token);
+
         //2 Set user (probably in AuthContext with the user info)
         // Should to set User setNewUser({result.user })
 

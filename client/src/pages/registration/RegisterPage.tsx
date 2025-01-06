@@ -23,7 +23,7 @@ export default function RegisterPage() {
     const requestOptions = {
       method: "POST",
       body: formdata,
-      redirect: "follow",
+      /* redirect: "follow", */
     };
     try {
       const response = await fetch(
@@ -48,6 +48,7 @@ export default function RegisterPage() {
       ...newUser!,
       [event.target.name]: [event.target.value],
     });
+    console.log(newUser);
   };
 
   const handleRegisterSubmit = async (event: FormEvent<HTMLFormElement>) => {

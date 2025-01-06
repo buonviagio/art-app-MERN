@@ -5,6 +5,9 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/registration/RegisterPage";
 import NavigationBar from "./components/NavigationBar";
+import CardsContainer from "./pages/cardsContainer/CardsContainer";
+import ProtectedRouteForProfilePage from "./protectedRoutes/ProtectedRouteForProfilePage";
+import ProfilePage from "./pages/profile/ProfilePage";
 
 /* const Root = () => {
   return (
@@ -57,9 +60,18 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Root />}>
-          {<Route index element={<HomePage />} />}
+          <Route index element={<HomePage />} />
+          <Route path="cardscontainer" element={<CardsContainer />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="login" element={<LoginPage />} />
+          <Route
+            path="profile"
+            element={
+              <ProtectedRouteForProfilePage>
+                <ProfilePage />
+              </ProtectedRouteForProfilePage>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>

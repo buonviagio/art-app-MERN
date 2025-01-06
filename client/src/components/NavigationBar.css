@@ -2,10 +2,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   border-radius: 15px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
   margin: 15px 20px;
+  background: linear-gradient(120deg, #ff7eb3, #ff758c, #ffeb3b, #83eaf1);
+  background-size: 400% 400%;
+  animation: gradient 10s infinite;
 }
 
 .navigation-bar-table {
@@ -59,4 +61,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Animation for gradient */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

@@ -19,3 +19,7 @@ export type LoginOkResponse = {
     },
     token: Token
 }
+
+export type GetProfileOkResponse = {
+    userProfile: User;
+}

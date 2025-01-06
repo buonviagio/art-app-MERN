@@ -146,8 +146,16 @@ const login = async (req, res) => {
 }
 
 const getProfile = async (req, res) => {
-    console.log('req :>> ', req);
-
+    console.log('req :>> ', req.user);
+    if (!req.user) {
+        return res.status(400).json({ error: "user not found" })
+    }
+    return res.status(200).json({
+        userProfile: {
+            userName: req.user.name,
+            email: req.user.email
+        }
+    })
 }
 
 export { avatarUpload, getUserWithPostedArts, register, login, getProfile };
