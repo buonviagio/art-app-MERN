@@ -3,6 +3,7 @@ export type UserImageType = {
 }
 
 export interface User extends UserImageType{
+    avatar: {secure_url: string};
     userName: string;
     email: string;
     password: string;

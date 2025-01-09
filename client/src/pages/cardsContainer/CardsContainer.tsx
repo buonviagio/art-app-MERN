@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import "./CardsContainer.css";
+import { NavLink } from "react-router";
 
 export default function CardsContainer() {
   const [allArtifacts, setAllArtifacts] = useState();
@@ -29,6 +30,11 @@ export default function CardsContainer() {
   }, []);
   return (
     <Container fluid className="my-4 px-4">
+      <Row>
+        <Col>
+          <NavLink to="/addart">Add new Art Object</NavLink>
+        </Col>
+      </Row>
       <Row xs={1} md={2} xl={3} className="g-4">
         {allArtifacts &&
           allArtifacts.map((artifact) => (

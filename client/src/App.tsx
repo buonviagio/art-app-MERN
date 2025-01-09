@@ -8,6 +8,7 @@ import NavigationBar from "./components/NavigationBar";
 import CardsContainer from "./pages/cardsContainer/CardsContainer";
 import ProtectedRouteForProfilePage from "./protectedRoutes/ProtectedRouteForProfilePage";
 import ProfilePage from "./pages/profile/ProfilePage";
+import AddingArtObject from "./pages/newArtObject/AddingArtObject";
 
 /* const Root = () => {
   return (
@@ -64,6 +65,7 @@ function App() {
           <Route path="cardscontainer" element={<CardsContainer />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="login" element={<LoginPage />} />
+          <Route path="addart" element={<AddingArtObject />} />
           <Route
             path="profile"
             element={

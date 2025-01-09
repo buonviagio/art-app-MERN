@@ -1,16 +1,21 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import "./RegisterPage.css";
-import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
-import { User } from "../../types/customType";
-import { NavLink } from "react-router";
+import { Alert, Button, Col, Form, InputGroup, Row } from "react-bootstrap";
+import { LoginOkResponse, User } from "../../types/customType";
+import { NavLink, useNavigate } from "react-router";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function RegisterPage() {
   // to think about tipe File |String
-  const [selectedFile, setSelectedFile] = useState<File | string>("");
+  const { login } = useContext(AuthContext);
+  /*   const [selectedFile, setSelectedFile] = useState<File | string>("");*/
   const [newUser, setNewUser] = useState<User | null>(null);
+  const [alert, setAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const navigate = useNavigate();
 
-  const handleAttachImage = (event: ChangeEvent<HTMLInputElement>) => {
+  /* const handleAttachImage = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || "";
     setSelectedFile(file);
   };
@@ -23,7 +28,6 @@ export default function RegisterPage() {
     const requestOptions = {
       method: "POST",
       body: formdata,
-      /* redirect: "follow", */
     };
     try {
       const response = await fetch(
@@ -41,19 +45,43 @@ export default function RegisterPage() {
     } catch (error) {
       console.log("error :>> ", error);
     }
-  };
+  }; */
 
   const handleRegisterChange = (event: ChangeEvent<HTMLInputElement>) => {
     setNewUser({
       ...newUser!,
-      [event.target.name]: [event.target.value],
+      [event.target.name]: event.target.value,
     });
-    console.log(newUser);
+    console.log("newUser =>", newUser);
   };
 
   const handleRegisterSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("newUser from handleRegisterSubmit:>> ", newUser);
+    const usernameRegEx = /^(?=.*[a-zA-Z])[\w!@#$%^&*()\-+?.]{2,20}$/;
+
+    // to restart alert after previous showing
+    setAlert(false);
+    setAlertMessage("");
+
+    if (!newUser) {
+      setAlert(true);
+      setAlertMessage("You have to fill out the registration form.");
+      return;
+    } else if (!usernameRegEx.test(newUser?.userName)) {
+      console.log("TegExpr =>", usernameRegEx.test(newUser?.userName));
+      setAlert(true);
+      setAlertMessage("Please enter a valid name of the user.");
+      return;
+    } else if (!/\S+@\S+\.\S+/.test(newUser.email)) {
+      setAlert(true);
+      setAlertMessage("Please enter a valid email address.");
+      return;
+    } else if (newUser.password.length < 6) {
+      setAlert(true);
+      setAlertMessage("Password must be at least 6 characters long.");
+      return;
+    }
+
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -66,11 +94,8 @@ export default function RegisterPage() {
         "avatar",
         newUser.userImage
           ? newUser.userImage
-          : "https://www.vecteezy.com/vector-art/8442080-user-icon-in-trendy-flat-style-isolated-on-white-background"
+          : "https://res.cloudinary.com/dzbkg3xj2/image/upload/v1733909667/projrct-app/d3dx8pyz9rqq9mzfkseb.webp"
       );
-    }
-    if (!newUser?.email) {
-      alert("email is missing");
     }
 
     const requestOptions = {
@@ -85,7 +110,53 @@ export default function RegisterPage() {
       );
 
       const result = await request.json();
-      console.log("result :>> ", result);
+      if (result.user) {
+        setAlert(true);
+        setAlertMessage(result.message);
+        loginNewlyRegisteredUser();
+        return;
+      } else {
+        //to show alert, that password or email are not write
+        setAlert(true);
+        setAlertMessage(result.message);
+        return;
+      }
+    } catch (error) {
+      console.log("error :>> ", error);
+    }
+  };
+
+  const loginNewlyRegisteredUser = async () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const urlencoded = new URLSearchParams();
+    urlencoded.append("email", newUser?.email);
+    urlencoded.append("password", newUser?.password);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: urlencoded,
+    };
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/user/login",
+        requestOptions
+      );
+
+      const result = (await response.json()) as LoginOkResponse;
+      if (result.token) {
+        //If there is a token in the response, store token
+        //localStorage.setItem("token", result.token);
+        login(result.token);
+
+        setTimeout(() => {
+          // redirect to the login page
+          navigate("/profile");
+        }, 2000);
+      }
     } catch (error) {
       console.log("error :>> ", error);
     }
@@ -93,39 +164,19 @@ export default function RegisterPage() {
 
   return (
     <div>
+      {alert && (
+        <Alert
+          variant={"primary"}
+          style={{
+            width: "80%",
+            margin: "2rem auto",
+          }}
+        >
+          {alertMessage}
+        </Alert>
+      )}
       <div className="register-container">
         <h2 className="text-primary fw-bold text-center mb-4">Register</h2>
-        {/* <Form onSubmit={hundleImageSubmit}>
-          <Row>
-            <Col>
-              <Form.Group controlId="formFile" className="mb-3">
-                <Form.Label>Upload your Foto here</Form.Label>
-                <Form.Control
-                  type="file"
-                  onChange={handleAttachImage}
-                  accept="image/png, image/jpeg, image/png, image/webp"
-                  className="w-100"
-                />
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Button variant="primary" type="submit">
-                Upload Foto
-              </Button>
-            </Col>
-          </Row>
-        </Form> */}
-        {/* <div className="avatar">
-          {newUser && (
-            <img
-              src={newUser.userImage}
-              alt="user avatar picture"
-              style={{ width: "100px", height: "100px" }}
-            />
-          )}
-        </div> */}
         <Form onSubmit={handleRegisterSubmit}>
           <Row>
             <Col>

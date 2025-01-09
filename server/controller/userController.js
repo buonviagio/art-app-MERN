@@ -3,10 +3,22 @@ import mongoose from "mongoose";
 import { pictureUpload } from "../utils/pictureUpload.js";
 import { encryptPassword, isPasswordCorrect } from "../utils/passwordServices.js";
 import { issueToken } from "../utils/tokenServices.js";
+import { pictureDelete } from "../utils/pictureDelete.js";
 
 const avatarUpload = async (req, res) => {
-    console.log('req :>> ', req.file);
+    /* console.log('req :>> ', req.file);
+    console.log('req.user._id :>> ', req.user._id); */
+    const userId = req.user._id;
+
     try {
+        //Before saving the avatar picture we have to delete the previous one, if does it exist
+        const user = await UserModel.findOne(userId);
+        const publicIdOfTheAvatar = user.avatar.public_id;
+        if (publicIdOfTheAvatar) {
+            await pictureDelete(publicIdOfTheAvatar);
+        }
+
+        // upload picture in cloudinary
         const uploadedImage = await pictureUpload(req.file.path);
         if (!uploadedImage) {
             console.log("upload failed");
@@ -16,6 +28,14 @@ const avatarUpload = async (req, res) => {
         }
 
         if (uploadedImage) {
+            // After saving the photo in cloudinary we save the metadata in database    
+            const updatedUser = await UserModel.findByIdAndUpdate(userId, {
+                avatar: {
+                    secure_url: uploadedImage.secure_url,
+                    public_id: uploadedImage.public_id
+                }
+            });
+            //Sent data to the client 
             return res.status(200).json({
                 message: "Avatar succesfully uploaded",
                 avatar: {
@@ -59,7 +79,7 @@ const register = async (req, res) => {
         if (existingUser) {
             console.log("YOU HAVE AN ACCOUNT");
             return res.status(400).json({
-                message: "Sorry, email already in use",
+                message: "The user with this email has already registered",
             })
         }
         if (!existingUser) {
@@ -67,7 +87,7 @@ const register = async (req, res) => {
 
             if (!hashedPassword) {
                 return res.status(500).json({
-                    error: "Sorry, sorry try again later",
+                    error: "Sorry, try again later",
                 })
             }
             if (hashedPassword) {
@@ -153,7 +173,8 @@ const getProfile = async (req, res) => {
     return res.status(200).json({
         userProfile: {
             userName: req.user.name,
-            email: req.user.email
+            email: req.user.email,
+            avatar: req.user.avatar
         }
     })
 }

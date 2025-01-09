@@ -15,9 +15,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         require: false
     },
+    // avatar: {
+    //     type: String,
+    //     require: false
+    // },
+
     avatar: {
-        type: String,
-        require: false
+        secure_url: { type: String, required: false },
+        public_id: { type: String, required: false }
     },
 
     postedArtObjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Art' }]

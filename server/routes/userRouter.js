@@ -6,7 +6,7 @@ const userRouter = express.Router();
 
 //userRouter.post("/register",  register);
 //userRouter.post("/register", multerUpload.single("avatar"), register);
-userRouter.post("/avatarUpload", multerUpload.single("avatar"), avatarUpload);
+userRouter.post("/avatarUpload", jwtAuth, multerUpload.single("avatar"), avatarUpload);
 userRouter.post("/register", register);
 userRouter.get("/getallinfo", getUserWithPostedArts);
 userRouter.post("/login", login);
