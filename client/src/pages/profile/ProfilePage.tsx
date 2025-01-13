@@ -1,12 +1,30 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { GetProfileOkResponse, User } from "../../types/customType";
-import { Button, Col, Container, Form, Row, Image } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Container,
+  Form,
+  Row,
+  Image,
+  Card,
+} from "react-bootstrap";
+import "./ProfilePage.css";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { TbRuler } from "react-icons/tb";
 
 export default function ProfilePage() {
   const [selectedFile, setSelectedFile] = useState<File | string>("");
   const [newUser, setNewUser] = useState<User | null>(null);
+  const [artsObjectsWhichPostedUser, setArtsObjectsWhichPostedUser] =
+    useState(null);
 
   const [userProfile, setUserProfile] = useState<User | null>(null);
+  const [isFavorite, setIsFavorite] = useState(true);
+
+  const handleFavoriteToggle = () => {
+    setIsFavorite(!isFavorite);
+  };
 
   const getProfileInfo = async () => {
     const token = localStorage.getItem("token");
@@ -35,7 +53,12 @@ export default function ProfilePage() {
           setUserProfile(result.userProfile);
           console.log("IMG :>> ", result.userProfile);
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(
+          "Error, request to the server is not successfull :>> ",
+          error
+        );
+      }
     }
   };
 
@@ -76,13 +99,40 @@ export default function ProfilePage() {
     }
   };
 
+  const getAllArtsObjectWhichUserPosted = async () => {
+    const token = localStorage.getItem("token");
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${token}`);
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+    };
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/arts/allUserArts",
+        requestOptions
+      );
+      if (response.ok) {
+        const result = await response.json();
+        setArtsObjectsWhichPostedUser(result);
+        console.log("Result art which posted user :>> ", result);
+        //setAllArtifacts(result.allArts);
+      } else {
+        console.log("We can not show you any of our artifacts");
+      }
+    } catch (error) {}
+  };
+
   useEffect(() => {
     getProfileInfo();
+    getAllArtsObjectWhichUserPosted();
   }, [newUser]);
 
   return (
     <div>
-      <h1 className="text-primary">ProfilePage</h1>
+      <h1 className="text-primary">Profile Page</h1>
       <div>
         {userProfile && (
           <div>
@@ -120,6 +170,53 @@ export default function ProfilePage() {
           </Col>
         </Row>
       </Form>
+      {artsObjectsWhichPostedUser && (
+        <div className="wrapper-for-container-with-arts-objects-of-user">
+          <h3 className="text-primary">Arts that you posted</h3>
+          <div className="container-with-arts-objects-of-user">
+            <Container fluid className="my-4 px-4">
+              <Row xs={1} md={2} xl={3} className="g-4">
+                {artsObjectsWhichPostedUser &&
+                  artsObjectsWhichPostedUser.map((artifact) => (
+                    <Col key={artifact._id}>
+                      <Card border="light" className="custom-card">
+                        <div style={{ position: "relative" }}>
+                          <Card.Img
+                            variant="top"
+                            src={artifact.picture.secure_url}
+                            className="custom-img"
+                          />
+                          <button
+                            onClick={handleFavoriteToggle}
+                            style={{
+                              position: "absolute",
+                              top: "10px",
+                              right: "10px",
+                              background: "transparent",
+                              border: "none",
+                              cursor: "pointer",
+                              zIndex: 1,
+                            }}
+                          >
+                            {isFavorite ? (
+                              <FaHeart color="red" size={30} />
+                            ) : (
+                              <FaRegHeart color="grey" size={30} />
+                            )}
+                          </button>
+                        </div>
+                        <Card.Body>
+                          <Card.Title>{artifact.nameOfThePainting}</Card.Title>
+                          <Card.Text>Year {artifact.year}</Card.Text>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  ))}
+              </Row>
+            </Container>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

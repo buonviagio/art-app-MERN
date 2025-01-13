@@ -6,8 +6,6 @@ import { issueToken } from "../utils/tokenServices.js";
 import { pictureDelete } from "../utils/pictureDelete.js";
 
 const avatarUpload = async (req, res) => {
-    /* console.log('req :>> ', req.file);
-    console.log('req.user._id :>> ', req.user._id); */
     const userId = req.user._id;
 
     try {

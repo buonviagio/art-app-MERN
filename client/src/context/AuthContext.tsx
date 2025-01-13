@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { User } from "../types/customType";
+import { GetProfileOkResponse, User } from "../types/customType";
 import { jwtDecode } from "jwt-decode";
 
 type AuthContextType = {
@@ -32,8 +32,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const nowTime = Date.now() / 1000;
 
         if (decoded.exp > nowTime) {
-          setIsAuthenticated(true);
-          setUser(decoded);
+          //setIsAuthenticated(true);
+          const myHeaders = new Headers();
+          myHeaders.append("Authorization", `Bearer ${token}`);
+
+          const requestOptions = {
+            method: "GET",
+            headers: myHeaders,
+          };
+
+          fetch("http://localhost:5000/api/user/profile", requestOptions)
+            .then((result) => {
+              const res = result.json();
+              console.log("object :>> ", res);
+              return res;
+            })
+            .then((data) => {
+              setUser(data.userProfile);
+              setIsAuthenticated(true);
+            });
         } else {
           localStorage.removeItem("token");
         }
@@ -45,9 +62,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (token: string) => {
     localStorage.setItem("token", token);
-    const decoded = jwtDecode(token) as any;
+    //const decoded = jwtDecode(token) as any;
     setIsAuthenticated(true);
-    setUser(decoded);
+    //setUser(decoded);
   };
 
   const logout = () => {

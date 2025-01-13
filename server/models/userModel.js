@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        require: false
+        require: true
     },
     // avatar: {
     //     type: String,
@@ -25,7 +25,9 @@ const userSchema = new mongoose.Schema({
         public_id: { type: String, required: false }
     },
 
-    postedArtObjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Art' }]
+    postedArtObjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Art' }],
+
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Art' }]
 }, {
     timestamps: {
         createdAt: 'created_at', // Use `created_at` to store the created date

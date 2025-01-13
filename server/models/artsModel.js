@@ -14,15 +14,25 @@ const artsSchema = new mongoose.Schema({
         require: true
     },
     style: {
-        type: String
+        type: String,
+        require: true
     },
     year: {
-        type: Number
+        type: Number,
+        require: true
     },
     picture: {
-        type: Object
+        secure_url: { type: String, required: true },
+        public_id: { type: String, required: true }
     },
-    userWhoPostedArt: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    description: {
+        type: String,
+        require: true
+    },
+    userWhoPostedArt: {
+        type: mongoose.Schema.Types.ObjectId, ref: 'User',
+        require: true
+    }
 })
 
 const ArtsModel = mongoose.model("Art", artsSchema);

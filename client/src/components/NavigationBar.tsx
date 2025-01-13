@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function NavigationBar() {
-  const { logout, isAuthenticated } = useContext(AuthContext);
+  const { logout, isAuthenticated, user } = useContext(AuthContext);
 
   const handleSignOut = () => {
     logout();
@@ -35,21 +35,20 @@ export default function NavigationBar() {
             </li>
           </>
         )}
-        {/* <li>
-          <NavLink to="/register">Sign In/Up</NavLink>
-        </li>
-        <li>
-          <NavLink to="/profile">Profile</NavLink>
-        </li>
-        <li>
-          <NavLink to="/" onClick={handleSignOut}>
-            Sign Out
-          </NavLink>
-        </li> */}
       </ul>
-      <div className="profile-icon">
-        <AccountCircle fontSize="large" sx={{ color: "#66ccff" }} />
-      </div>
+      {isAuthenticated && (
+        <div className="profile-icon">
+          {user?.avatar.secure_url ? (
+            <img
+              src={user?.avatar.secure_url}
+              alt="Profile"
+              className="profile-picture"
+            />
+          ) : (
+            <AccountCircle fontSize="large" sx={{ color: "#66ccff" }} />
+          )}
+        </div>
+      )}
     </nav>
   );
 }

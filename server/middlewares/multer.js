@@ -8,9 +8,6 @@ const fileFilter = (req, file, cb) => {
 
     // The function should call `cb` with a boolean
     // to indicate if the file should be accepted
-    // console.log('req :>> ', req);
-    console.log("fileFilter");
-    console.log('file :>> ', file);
     const fileExtension = path.extname(file.originalname)
 
     if (fileExtension !== ".jpeg" && fileExtension !== ".jpg" && fileExtension !== ".png" && fileExtension !== ".webp") {

@@ -1,0 +1,11 @@
+.wrapper-for-container-with-arts-objects-of-user {
+  display: flex;
+  /* justify-content: center; */
+  flex-direction: column;
+  /* align-content: center; */
+  align-items: center;
+}
+
+.container-with-arts-objects-of-user {
+  width: 70%;
+}
