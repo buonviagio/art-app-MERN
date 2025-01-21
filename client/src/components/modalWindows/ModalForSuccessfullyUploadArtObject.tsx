@@ -3,9 +3,8 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
 interface ModalForSuccessfullyUploadArtObjectProps {
-  setModalShow: React.Dispatch<React.SetStateAction<boolean>>; // Function to update modal state
+  setModalShow: React.Dispatch<React.SetStateAction<boolean>>;
   returnedArtObject?: {
-    // Optional: Art object details
     picture: { secure_url: string };
     nameOfThePainting: string;
     nameOfTheAuthor: string;
@@ -13,7 +12,6 @@ interface ModalForSuccessfullyUploadArtObjectProps {
     year: number;
     location: string;
   };
-  // Optional: Message to display
   returnedMessage?: string;
 }
 

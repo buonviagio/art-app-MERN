@@ -1,19 +1,30 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { GetProfileOkResponse, User } from "../types/customType";
+import { ExistingUserInDB } from "../types/customType";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router";
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  user: User | null;
+  user: ExistingUserInDB;
+  loading: boolean;
+  setUser: (
+    user: ExistingUserInDB | ((prevUser: ExistingUserInDB) => ExistingUserInDB)
+  ) => void;
   login: (token: string) => void;
   logout: () => void;
 };
 
 const AuthContextInitialValue = {
   isAuthenticated: false,
-  user: null,
+  user: {
+    userName: "Guest",
+    email: "",
+    userId: "",
+  },
+  loading: true,
   login: () => {},
   logout: () => {},
+  setUser: () => {},
 };
 
 export const AuthContext = createContext<AuthContextType>(
@@ -22,10 +33,29 @@ export const AuthContext = createContext<AuthContextType>(
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<ExistingUserInDB>({
+    userName: "Guest",
+    email: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  const login = async (token: string) => {
+    localStorage.setItem("token", token);
+    console.log("1!");
+    await fetchProfileData();
+    navigate("/profile");
+    setLoading(false);
+    console.log("4!");
+  };
+
+  const fetchProfileData = async () => {
     const token = localStorage.getItem("token");
+    console.log("2!");
     if (token) {
       try {
         const decoded = jwtDecode(token) as any;
@@ -41,16 +71,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             headers: myHeaders,
           };
 
-          fetch("http://localhost:5000/api/user/profile", requestOptions)
-            .then((result) => {
-              const res = result.json();
-              console.log("object :>> ", res);
-              return res;
-            })
-            .then((data) => {
-              setUser(data.userProfile);
-              setIsAuthenticated(true);
-            });
+          const result = await fetch(
+            "http://localhost:5000/api/user/profile",
+            requestOptions
+          );
+          console.log("3!");
+          const data = await result.json();
+
+          setUser(data.userProfile);
+          setIsAuthenticated(true);
+          setLoading(false);
         } else {
           localStorage.removeItem("token");
         }
@@ -58,23 +88,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem("token");
       }
     }
-  }, []);
-
-  const login = (token: string) => {
-    localStorage.setItem("token", token);
-    //const decoded = jwtDecode(token) as any;
-    setIsAuthenticated(true);
-    //setUser(decoded);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
-    setUser(null);
+    setUser({
+      userName: "Guest",
+      email: "",
+    });
+    setLoading(true);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, setUser, login, logout, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

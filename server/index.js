@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import colors from "colors";
 import artsRouter from "./routes/artsRouter.js";
 import userRouter from "./routes/userRouter.js";
+import commentRouter from "./routes/commentRouter.js";
 import cloudinaryConfig from "./config/cloudinaryConfiguration.js";
 import passportStrategy from "./config/passport.js";
 import passport from "passport";
@@ -52,7 +53,8 @@ const startServer = () => {
 const addRoutes = () => {
     app.use("/api", testRouter);
     app.use("/api/arts", artsRouter);
-    app.use("/api/user", userRouter)
+    app.use("/api/user", userRouter);
+    app.use("/api/comments", commentRouter);
 }
 
 //IIFE

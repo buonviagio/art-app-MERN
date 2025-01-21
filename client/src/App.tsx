@@ -9,6 +9,7 @@ import CardsContainer from "./pages/cardsContainer/CardsContainer";
 import ProtectedRouteForProfilePage from "./protectedRoutes/ProtectedRouteForProfilePage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import AddingArtObject from "./pages/newArtObject/AddingArtObject";
+import DetailsPage from "./pages/detailsPage/DetailsPage";
 
 /* const Root = () => {
   return (
@@ -58,25 +59,24 @@ const Root = () => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Root />}>
-          <Route index element={<HomePage />} />
-          <Route path="cardscontainer" element={<CardsContainer />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="addart" element={<AddingArtObject />} />
-          <Route
-            path="profile"
-            element={
-              <ProtectedRouteForProfilePage>
-                <ProfilePage />
-              </ProtectedRouteForProfilePage>
-            }
-          />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Root />}>
+        <Route index element={<HomePage />} />
+        <Route path="cardscontainer" element={<CardsContainer />} />
+        <Route path="register" element={<RegisterPage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="addart" element={<AddingArtObject />} />
+        <Route path="art/:artditail" element={<DetailsPage />} />
+        <Route
+          path="profile"
+          element={
+            <ProtectedRouteForProfilePage>
+              <ProfilePage />
+            </ProtectedRouteForProfilePage>
+          }
+        />
+      </Route>
+    </Routes>
   );
 }
 

@@ -1,16 +1,14 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
-import { LoginOkResponse, User } from "../../types/customType";
+import { LoginOkResponse } from "../../types/customType";
 import { Alert, Button, Col, Form, InputGroup, Row } from "react-bootstrap";
-import useUserStatus from "../../hooks/useUserStatus";
 import { AuthContext } from "../../context/AuthContext";
-import { useNavigate } from "react-router";
 
 export default function LoginPage() {
   const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const isUserLOGEDIN = useUserStatus();
-  /* const [newUser, setNewUser] = useState<User | null>(null); */
+
+  //const isUserLOGEDIN = useUserStatus();
+
   const [userCredentials, setUserCredentials] = useState({
     email: "",
     password: "",
@@ -61,18 +59,10 @@ export default function LoginPage() {
       );
 
       const result = (await response.json()) as LoginOkResponse;
-      /* console.log("result :>> ", result); */
 
       if (result.token) {
-        //If there is a token in the response, store token
-        //localStorage.setItem("token", result.token);
+        //set the user in AuthContext
         login(result.token);
-        // After successfull login we redirect the user to the profile page.
-        navigate("/profile");
-        //2 Set user (probably in AuthContext with the user info)
-        // Should to set User setNewUser({result.user })
-
-        console.log("isUserLOGEDIN :>> ", isUserLOGEDIN);
       } else {
         throw new Error(result.message);
       }

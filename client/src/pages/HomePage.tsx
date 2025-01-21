@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import NavigationBar from "../components/NavigationBar";
 import "./HomePage.css";
-import RegisterPage from "./registration/RegisterPage";
 
 export default function HomePage() {
   const [text, setText] = useState("");

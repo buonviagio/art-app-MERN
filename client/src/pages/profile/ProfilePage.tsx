@@ -1,5 +1,9 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { GetProfileOkResponse, User } from "../../types/customType";
+import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
+import {
+  ArtsObjectResponce,
+  GetProfileOkResponse,
+  User,
+} from "../../types/customType";
 import {
   Button,
   Col,
@@ -8,22 +12,125 @@ import {
   Row,
   Image,
   Card,
+  Carousel,
 } from "react-bootstrap";
 import "./ProfilePage.css";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { TbRuler } from "react-icons/tb";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { GoPencil } from "react-icons/go";
+import CarouseForFavoritesl from "../../components/carouselForFavoriteArtObjects/CarouseForFavoritesl";
+import { AuthContext } from "../../context/AuthContext";
+import UpdatingArtObject from "../../components/updatingArtObject/UpdatingArtObject";
+import { FaHeart } from "react-icons/fa";
 
 export default function ProfilePage() {
+  const { setUser } = useContext(AuthContext);
   const [selectedFile, setSelectedFile] = useState<File | string>("");
-  const [newUser, setNewUser] = useState<User | null>(null);
-  const [artsObjectsWhichPostedUser, setArtsObjectsWhichPostedUser] =
-    useState(null);
-
+  //const [newUser, setNewUser] = useState<User | null>(null);
+  const [artsObjectsWhichPostedUser, setArtsObjectsWhichPostedUser] = useState<
+    ArtsObjectResponce[] | null
+  >(null);
   const [userProfile, setUserProfile] = useState<User | null>(null);
-  const [isFavorite, setIsFavorite] = useState(true);
+  const [favorites, setFavorites] = useState<ArtsObjectResponce[] | null>(null);
+  const [modalWindowForUpdatingArtObject, setModalWindowForUpdatingArtObject] =
+    useState(false);
+  const [selectedArtifactIDForUpdating, setSelectedArtifactIDForUpdating] =
+    useState("");
+  const [showUploadSection, setShowUploadSection] = useState(false);
 
-  const handleFavoriteToggle = () => {
-    setIsFavorite(!isFavorite);
+  const fetchFavorites = async () => {
+    const token = localStorage.getItem("token");
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${token}`);
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+    };
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/arts/getAllFavoritesForProfilePage",
+        requestOptions
+      );
+      if (response.ok) {
+        const result = await response.json();
+        setFavorites(result.favorites);
+      }
+    } catch (error) {
+      console.log("error during fetching favorites art objects :>> ", error);
+    }
+  };
+
+  const handleFavoriteToggle = async (artifactId: string) => {
+    const token = localStorage.getItem("token");
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+    myHeaders.append("Authorization", `Bearer ${token}`);
+
+    const urlencoded = new URLSearchParams();
+    urlencoded.append("artId", artifactId);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: urlencoded,
+    };
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/arts/addtofavorite",
+        requestOptions
+      );
+      if (response.ok) {
+        //const result = await response.json();
+        //setFavorites(result.favorites);
+        if (favorites) {
+          setFavorites((prevFavorites) => {
+            return (
+              prevFavorites &&
+              prevFavorites.filter((artifact) => artifact._id !== artifactId)
+            );
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeleteToggle = async (artifactId: string) => {
+    const token = localStorage.getItem("token");
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+    myHeaders.append("Authorization", `Bearer ${token}`);
+
+    const urlencoded = new URLSearchParams();
+    urlencoded.append("artId", artifactId);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: urlencoded,
+    };
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/arts/deleteArtObject",
+        requestOptions
+      );
+
+      if (response.ok) {
+        console.log("art object was deleted");
+        const result = await response.json();
+        console.log("result after deleting:>> ", result);
+        //setFavorites(result.favorites);
+        //WE NEED TO UPDATE THE PAGE AFTER DELETE
+        fetchFavorites();
+      } else {
+        console.log("we can not delete this item object");
+      }
+    } catch (error) {
+      console.log("Error was accures during deleting ArtObject :>> ", error);
+    }
   };
 
   const getProfileInfo = async () => {
@@ -51,7 +158,6 @@ export default function ProfilePage() {
         if (response.ok) {
           const result = (await response.json()) as GetProfileOkResponse;
           setUserProfile(result.userProfile);
-          console.log("IMG :>> ", result.userProfile);
         }
       } catch (error) {
         console.log(
@@ -89,10 +195,13 @@ export default function ProfilePage() {
       }
       if (response.ok) {
         const result = await response.json();
-        console.log("result :>> ", result);
-        // we have to save picture in the data base
-        setNewUser({ ...newUser!, userImage: result.avatar.secure_url });
-        console.log("newUser :>> ", newUser);
+        //setNewUser({ ...newUser!, userImage: result.avatar.secure_url });
+        //console.log("newUser :>> ", newUser);
+        console.log("RESULT AFTER UPLOADING AVATAR :>> ", result);
+        setUser((prevUser) => ({
+          ...prevUser,
+          avatar: { secure_url: result.avatar.secure_url },
+        }));
       }
     } catch (error) {
       console.log("error :>> ", error);
@@ -117,8 +226,6 @@ export default function ProfilePage() {
       if (response.ok) {
         const result = await response.json();
         setArtsObjectsWhichPostedUser(result);
-        console.log("Result art which posted user :>> ", result);
-        //setAllArtifacts(result.allArts);
       } else {
         console.log("We can not show you any of our artifacts");
       }
@@ -128,11 +235,148 @@ export default function ProfilePage() {
   useEffect(() => {
     getProfileInfo();
     getAllArtsObjectWhichUserPosted();
-  }, [newUser]);
+    fetchFavorites();
+  }, []);
 
   return (
+    <div className="profile-page-container text-center py-4">
+      <h1 className="text-primary mb-4">Profile Page</h1>
+
+      {/* User Information Section */}
+      {userProfile && (
+        <div
+          className="user-info-section card mx-auto p-4 mb-5"
+          style={{ maxWidth: "500px" }}
+        >
+          <Image
+            src={userProfile.avatar.secure_url}
+            roundedCircle
+            className="mb-3"
+            style={{ width: "120px", height: "120px", objectFit: "cover" }}
+          />
+          <h3 className="text-muted mb-1">{userProfile.userName}</h3>
+          <p className="text-muted">{userProfile.email}</p>
+          <Button
+            variant="secondary"
+            onClick={() => setShowUploadSection(!showUploadSection)}
+          >
+            {showUploadSection ? "Cancel" : "Add Avatar"}
+          </Button>
+        </div>
+      )}
+
+      {/* Upload Avatar Section */}
+      {showUploadSection && (
+        <div
+          className="upload-section card mx-auto p-4 mb-5"
+          style={{ maxWidth: "500px" }}
+        >
+          <Form onSubmit={hundleImageSubmit}>
+            <Form.Group controlId="formFile" className="mb-3">
+              <Form.Label>Upload Your Photo</Form.Label>
+              <Form.Control
+                type="file"
+                onChange={handleAttachImage}
+                accept="image/png, image/jpeg, image/webp"
+              />
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Upload Photo
+            </Button>
+          </Form>
+        </div>
+      )}
+
+      {/* Favorites Carousel Section */}
+      <div className="favorites-section mb-5">
+        <h2 className="text-primary mb-3">Your Favorites</h2>
+        <CarouseForFavoritesl
+          favorites={favorites}
+          handleFavoriteToggle={handleFavoriteToggle}
+        />
+      </div>
+
+      {/* User's Posted Arts Section */}
+      {artsObjectsWhichPostedUser && (
+        <div className="posted-arts-section">
+          <h2 className="text-primary mb-4">Your Posted Arts</h2>
+          <Container fluid>
+            <Row xs={1} md={2} xl={3} className="g-4">
+              {artsObjectsWhichPostedUser.map((artifact) => (
+                <Col key={artifact._id}>
+                  <Card
+                    className="custom-card border-0 shadow-sm"
+                    key={"Primary"}
+                  >
+                    <div style={{ position: "relative" }}>
+                      <Card.Img
+                        variant="top"
+                        src={artifact.picture.secure_url}
+                        className="custom-img"
+                        style={{ height: "200px", objectFit: "cover" }}
+                      />
+                      <button
+                        className="custom-button"
+                        onClick={() => handleDeleteToggle(artifact._id)}
+                        style={{
+                          position: "absolute",
+                          top: "10px",
+                          right: "10px",
+                          background: "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                          zIndex: 1,
+                        }}
+                      >
+                        <RiDeleteBin6Line size={30} />
+                      </button>
+                      <button
+                        className="custom-button"
+                        onClick={() => {
+                          setModalWindowForUpdatingArtObject((prev) => !prev);
+                          setSelectedArtifactIDForUpdating(artifact._id);
+                        }}
+                        style={{
+                          position: "absolute",
+                          bottom: "10px",
+                          right: "10px",
+                          background: "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                          zIndex: 1,
+                        }}
+                      >
+                        <GoPencil size={30} />
+                      </button>
+                    </div>
+                    <Card.Body>
+                      <Card.Title>{artifact.nameOfThePainting}</Card.Title>
+                      <Card.Text>Year: {artifact.year}</Card.Text>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </Container>
+        </div>
+      )}
+
+      {/* Free Space at the Bottom */}
+      <div style={{ height: "50px" }}></div>
+    </div>
+  );
+
+  /* return (
     <div>
       <h1 className="text-primary">Profile Page</h1>
+      {modalWindowForUpdatingArtObject && (
+        <UpdatingArtObject
+          setModalWindowForUpdatingArtObject={
+            setModalWindowForUpdatingArtObject
+          }
+          selectedArtifactIDForUpdating={selectedArtifactIDForUpdating}
+        />
+      )}
       <div>
         {userProfile && (
           <div>
@@ -187,7 +431,10 @@ export default function ProfilePage() {
                             className="custom-img"
                           />
                           <button
-                            onClick={handleFavoriteToggle}
+                            className="custom-button"
+                            onClick={() => {
+                              handleDeleteToggle(artifact._id);
+                            }}
                             style={{
                               position: "absolute",
                               top: "10px",
@@ -198,12 +445,31 @@ export default function ProfilePage() {
                               zIndex: 1,
                             }}
                           >
-                            {isFavorite ? (
-                              <FaHeart color="red" size={30} />
-                            ) : (
-                              <FaRegHeart color="grey" size={30} />
-                            )}
+                            <RiDeleteBin6Line size={30} />
                           </button>
+                          {
+                            <button
+                              className="custom-button"
+                              onClick={() => {
+                                //handleFavoriteToggle(artifact._id);
+                                setModalWindowForUpdatingArtObject(
+                                  (prev) => !prev
+                                );
+                                setSelectedArtifactIDForUpdating(artifact._id);
+                              }}
+                              style={{
+                                position: "absolute",
+                                bottom: "-60px",
+                                right: "10px",
+                                background: "transparent",
+                                border: "none",
+                                cursor: "pointer",
+                                zIndex: 1,
+                              }}
+                            >
+                              <GoPencil size={30} />
+                            </button>
+                          }
                         </div>
                         <Card.Body>
                           <Card.Title>{artifact.nameOfThePainting}</Card.Title>
@@ -217,6 +483,10 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+      <CarouseForFavoritesl
+        favorites={favorites}
+        handleFavoriteToggle={handleFavoriteToggle}
+      />
     </div>
-  );
+  ); */
 }

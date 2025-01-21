@@ -1,11 +1,11 @@
 import { NavLink } from "react-router";
 import "./NavigationBar.css";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function NavigationBar() {
-  const { logout, isAuthenticated, user } = useContext(AuthContext);
+  const { logout, isAuthenticated, user, loading } = useContext(AuthContext);
 
   const handleSignOut = () => {
     logout();
@@ -38,9 +38,9 @@ export default function NavigationBar() {
       </ul>
       {isAuthenticated && (
         <div className="profile-icon">
-          {user?.avatar.secure_url ? (
+          {user?.avatar?.secure_url ? (
             <img
-              src={user?.avatar.secure_url}
+              src={user.avatar.secure_url}
               alt="Profile"
               className="profile-picture"
             />

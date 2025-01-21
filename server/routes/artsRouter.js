@@ -1,5 +1,17 @@
 import express from "express";
-import { getAllArts, getArtByAuthorName, getArtByStyle, uploadArtObject, getArtWithUser, addArtObjectToFavoitesOfUser } from "../controller/artsController.js";
+import {
+    getAllArts,
+    getArtByAuthorName,
+    getArtByStyle,
+    uploadArtObject,
+    getArtWithUser,
+    addArtObjectToFavoitesOfUser,
+    getAllFavoriteArtObjecsOfUser,
+    deleteArtObject,
+    getAllFavoriteArtObjecsOfUserForProfilePage,
+    updateArtObject,
+    getArtByID
+} from "../controller/artsController.js";
 import multerUpload from "../middlewares/multer.js";
 import jwtAuth from "../middlewares/jwtAuth.js";
 
@@ -17,5 +29,15 @@ artsRouter.post("/aploadArtObject", jwtAuth, multerUpload.single("artphoto"), up
 artsRouter.get("/allUserArts", jwtAuth, getArtWithUser);
 //to add artObject to favorite
 artsRouter.post("/addtofavorite", jwtAuth, addArtObjectToFavoitesOfUser);
+// to get all favorite arts object when the user loged in
+artsRouter.get("/getAllFavorites", jwtAuth, getAllFavoriteArtObjecsOfUser);
+//delete art object
+artsRouter.post("/deleteArtObject", jwtAuth, deleteArtObject);
+// to get all favorite arts object to show on Profile
+artsRouter.get("/getAllFavoritesForProfilePage", jwtAuth, getAllFavoriteArtObjecsOfUserForProfilePage);
+//updating art object
+artsRouter.post("/updateArtObject", jwtAuth, multerUpload.single("artphoto"), updateArtObject);
+//get art object by ID
+artsRouter.get("/:id", jwtAuth, getArtByID);
 
 export default artsRouter;  

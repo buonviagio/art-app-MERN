@@ -15,10 +15,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    // avatar: {
-    //     type: String,
-    //     require: false
-    // },
 
     avatar: {
         secure_url: { type: String, required: false },
@@ -30,7 +26,7 @@ const userSchema = new mongoose.Schema({
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Art' }]
 }, {
     timestamps: {
-        createdAt: 'created_at', // Use `created_at` to store the created date
+        createdAt: 'created_at', // Use created_at to store the created date
         updatedAt: 'updated_at' // and `updated_at` to store the last updated date
     }
 })

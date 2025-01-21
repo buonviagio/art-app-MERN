@@ -15,44 +15,11 @@ export default function RegisterPage() {
   const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
 
-  /* const handleAttachImage = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || "";
-    setSelectedFile(file);
-  };
-
-  const hundleImageSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formdata = new FormData();
-    formdata.append("avatar", selectedFile);
-
-    const requestOptions = {
-      method: "POST",
-      body: formdata,
-    };
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/user/avatarUpload",
-        requestOptions
-      );
-      if (!response.ok) {
-        throw new Error("something went wrong in the resoponse");
-      }
-      if (response.ok) {
-        const result = await response.json();
-        console.log("result :>> ", result);
-        setNewUser({ ...newUser!, userImage: result.avatar.secure_url });
-      }
-    } catch (error) {
-      console.log("error :>> ", error);
-    }
-  }; */
-
   const handleRegisterChange = (event: ChangeEvent<HTMLInputElement>) => {
     setNewUser({
       ...newUser!,
       [event.target.name]: event.target.value,
     });
-    console.log("newUser =>", newUser);
   };
 
   const handleRegisterSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -131,8 +98,10 @@ export default function RegisterPage() {
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
     const urlencoded = new URLSearchParams();
-    urlencoded.append("email", newUser?.email);
-    urlencoded.append("password", newUser?.password);
+    if (newUser) {
+      urlencoded.append("email", newUser.email);
+      urlencoded.append("password", newUser.password);
+    }
 
     const requestOptions = {
       method: "POST",

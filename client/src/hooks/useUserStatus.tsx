@@ -13,10 +13,8 @@ export default function useUserStatus() {
         const decoded = jwtDecode(token);
         const nowTime = Date.now() / 1000;
         const expirationTime = decoded.exp;
-        console.log("UseUserStatusBlock", expirationTime - nowTime);
-        if (expirationTime > nowTime) {
+        if (expirationTime !== undefined && expirationTime > nowTime) {
           setIsUserLoggedIn(true);
-          console.log("UseUserStatusBlock BLOCK IF");
         }
       } catch (error) {
         console.log("Invalid token :>> ", error);

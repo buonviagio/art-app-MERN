@@ -43,17 +43,13 @@ const avatarUpload = async (req, res) => {
             })
         }
     } catch (error) {
-        console.log("upload failed");
-        return res.status(500).json({
-            error: `Something went wrong ${error}`
-        })
+        console.log("upload failed ", error);
     }
 
 }
 
 //function with method populate()
 const getUserWithPostedArts = async (reqquest, response) => {
-    console.log("MEHOD getUserWithPostedArts");
     try {
         const uallUser = await UserModel.find({}).populate({ path: "postedArtObjects" })
         if (!uallUser) {
@@ -75,7 +71,6 @@ const register = async (req, res) => {
     try {
         const existingUser = await UserModel.findOne({ email: email })
         if (existingUser) {
-            console.log("YOU HAVE AN ACCOUNT");
             return res.status(400).json({
                 message: "The user with this email has already registered",
             })
@@ -157,14 +152,11 @@ const login = async (req, res) => {
 
         }
     } catch (error) {
-        return res.status(500).json({
-            error: error
-        })
+        console.log('error, problem on the server to login :>> ', error);
     }
 }
 
 const getProfile = async (req, res) => {
-    console.log('req :>> ', req.user);
     if (!req.user) {
         return res.status(400).json({ error: "user not found" })
     }
@@ -172,7 +164,8 @@ const getProfile = async (req, res) => {
         userProfile: {
             userName: req.user.name,
             email: req.user.email,
-            avatar: req.user.avatar
+            avatar: req.user.avatar,
+            userId: req.user._id
         }
     })
 }

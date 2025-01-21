@@ -9,3 +9,10 @@
 .container-with-arts-objects-of-user {
   width: 70%;
 }
+.custom-button {
+  color: "black";
+}
+
+.custom-button:hover svg {
+  color: green;
+}

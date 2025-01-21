@@ -15,17 +15,6 @@ export default function AddingArtObject() {
     location: string;
   } | null>(null);
   const [returnedMessage, setReturnedMessage] = useState("");
-  // change from state variable to plain variable
-  /*   const [artObject, setArtObject] = useState({
-    art: "",
-    author: "",
-    style: "",
-    year: "",
-    location: "",
-    description: "",
-    artphoto: null,
-    terms: false,
-  }); */
 
   const artObject = {
     art: "",
