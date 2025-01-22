@@ -16,3 +16,58 @@
 .custom-button:hover svg {
   color: green;
 }
+
+.favorites-section,
+.posted-arts-section {
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+.my-masonry-grid {
+  display: flex;
+  margin-left: -15px; /* gutter size offset */
+  width: auto;
+}
+.my-masonry-grid_column {
+  padding-left: 15px; /* gutter size */
+  background-clip: padding-box;
+}
+
+.masonry-item {
+  margin-bottom: 30px;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.masonry-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+}
+
+.masonry-text {
+  padding: 10px;
+  background: #f9f9f9;
+  text-align: center;
+  border-radius: 0 0 10px 10px;
+}
+
+.masonry-text h5 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.masonry-text p {
+  margin: 5px 0 0;
+  font-size: 0.9em;
+  color: #777;
+}
+
+/* .masonry-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s, box-shadow 0.3s;
+} */

@@ -5,8 +5,11 @@ import { NavLink, useNavigate } from "react-router";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
 import { ArtsObjectResponce } from "../../types/customType";
+import ArtSelection from "../../components/selectSection/ArtSelection";
+import ArtStyleDropdown from "../../components/artStyleDropdown/ArtStyleDropdown";
 
 export default function CardsContainer() {
+  console.log("CardsContainer component");
   const { isAuthenticated } = useContext(AuthContext);
   const [allArtifacts, setAllArtifacts] = useState<ArtsObjectResponce[] | null>(
     null
@@ -85,7 +88,6 @@ export default function CardsContainer() {
       );
       if (response.ok) {
         const result = await response.json();
-        console.log("result.favorites :>> ", result.favorites);
         setFavorites(result.favorites);
         setGoTotheCart(true);
       } else {
@@ -126,6 +128,13 @@ export default function CardsContainer() {
       <Row>
         <Col>
           <NavLink to="/addart">Add new Art Object</NavLink>
+        </Col>
+        <Col>
+          <ArtSelection setAllArtifacts={setAllArtifacts} />
+        </Col>
+
+        <Col>
+          <ArtStyleDropdown setAllArtifacts={setAllArtifacts} />
         </Col>
       </Row>
       <Row xs={1} md={2} xl={3} className="g-4">

@@ -21,6 +21,7 @@ import CarouseForFavoritesl from "../../components/carouselForFavoriteArtObjects
 import { AuthContext } from "../../context/AuthContext";
 import UpdatingArtObject from "../../components/updatingArtObject/UpdatingArtObject";
 import { FaHeart } from "react-icons/fa";
+import Masonry from "react-masonry-css";
 
 export default function ProfilePage() {
   const { setUser } = useContext(AuthContext);
@@ -36,6 +37,12 @@ export default function ProfilePage() {
   const [selectedArtifactIDForUpdating, setSelectedArtifactIDForUpdating] =
     useState("");
   const [showUploadSection, setShowUploadSection] = useState(false);
+
+  const breakpointColumnsObj = {
+    default: 3,
+    1100: 2,
+    700: 1,
+  };
 
   const fetchFavorites = async () => {
     const token = localStorage.getItem("token");
@@ -240,6 +247,14 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page-container text-center py-4">
+      {modalWindowForUpdatingArtObject && (
+        <UpdatingArtObject
+          setModalWindowForUpdatingArtObject={
+            setModalWindowForUpdatingArtObject
+          }
+          selectedArtifactIDForUpdating={selectedArtifactIDForUpdating}
+        />
+      )}
       <h1 className="text-primary mb-4">Profile Page</h1>
 
       {/* User Information Section */}
@@ -300,65 +315,123 @@ export default function ProfilePage() {
       {artsObjectsWhichPostedUser && (
         <div className="posted-arts-section">
           <h2 className="text-primary mb-4">Your Posted Arts</h2>
-          <Container fluid>
-            <Row xs={1} md={2} xl={3} className="g-4">
-              {artsObjectsWhichPostedUser.map((artifact) => (
-                <Col key={artifact._id}>
-                  <Card
-                    className="custom-card border-0 shadow-sm"
-                    key={"Primary"}
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="my-masonry-grid"
+            columnClassName="my-masonry-grid_column"
+          >
+            {artsObjectsWhichPostedUser.map((artifact) => (
+              <div key={artifact._id} className="masonry-item">
+                <div style={{ position: "relative" }}>
+                  <img
+                    src={artifact.picture.secure_url}
+                    alt={artifact.nameOfThePainting}
+                    className="masonry-img"
+                  />
+                  <button
+                    className="custom-button"
+                    onClick={() => handleDeleteToggle(artifact._id)}
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      zIndex: 1,
+                    }}
                   >
-                    <div style={{ position: "relative" }}>
-                      <Card.Img
-                        variant="top"
-                        src={artifact.picture.secure_url}
-                        className="custom-img"
-                        style={{ height: "200px", objectFit: "cover" }}
-                      />
-                      <button
-                        className="custom-button"
-                        onClick={() => handleDeleteToggle(artifact._id)}
-                        style={{
-                          position: "absolute",
-                          top: "10px",
-                          right: "10px",
-                          background: "transparent",
-                          border: "none",
-                          cursor: "pointer",
-                          zIndex: 1,
-                        }}
-                      >
-                        <RiDeleteBin6Line size={30} />
-                      </button>
-                      <button
-                        className="custom-button"
-                        onClick={() => {
-                          setModalWindowForUpdatingArtObject((prev) => !prev);
-                          setSelectedArtifactIDForUpdating(artifact._id);
-                        }}
-                        style={{
-                          position: "absolute",
-                          bottom: "10px",
-                          right: "10px",
-                          background: "transparent",
-                          border: "none",
-                          cursor: "pointer",
-                          zIndex: 1,
-                        }}
-                      >
-                        <GoPencil size={30} />
-                      </button>
-                    </div>
-                    <Card.Body>
-                      <Card.Title>{artifact.nameOfThePainting}</Card.Title>
-                      <Card.Text>Year: {artifact.year}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </Container>
+                    <RiDeleteBin6Line size={30} />
+                  </button>
+                  <button
+                    className="custom-button"
+                    onClick={() => {
+                      setModalWindowForUpdatingArtObject((prev) => !prev);
+                      setSelectedArtifactIDForUpdating(artifact._id);
+                    }}
+                    style={{
+                      position: "absolute",
+                      bottom: "10px",
+                      right: "10px",
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      zIndex: 1,
+                    }}
+                  >
+                    <GoPencil size={30} />
+                  </button>
+                </div>
+                <div className="masonry-text">
+                  <h5>{artifact.nameOfThePainting}</h5>
+                  <p>Year: {artifact.year}</p>
+                </div>
+              </div>
+            ))}
+          </Masonry>
         </div>
+
+        // <div className="posted-arts-section">
+        //   <h2 className="text-primary mb-4">Your Posted Arts</h2>
+        //   <Container fluid>
+        //     <Row xs={1} md={2} xl={3} className="g-4">
+        //       {artsObjectsWhichPostedUser.map((artifact) => (
+        //         <Col key={artifact._id}>
+        //           <Card
+        //             className="custom-card border-0 shadow-sm"
+        //             key={"Primary"}
+        //           >
+        //             <div style={{ position: "relative" }}>
+        //               <Card.Img
+        //                 variant="top"
+        //                 src={artifact.picture.secure_url}
+        //                 className="custom-img"
+        //                 style={{ height: "200px", objectFit: "cover" }}
+        //               />
+        //               <button
+        //                 className="custom-button"
+        //                 onClick={() => handleDeleteToggle(artifact._id)}
+        //                 style={{
+        //                   position: "absolute",
+        //                   top: "10px",
+        //                   right: "10px",
+        //                   background: "transparent",
+        //                   border: "none",
+        //                   cursor: "pointer",
+        //                   zIndex: 1,
+        //                 }}
+        //               >
+        //                 <RiDeleteBin6Line size={30} />
+        //               </button>
+        //               <button
+        //                 className="custom-button"
+        //                 onClick={() => {
+        //                   setModalWindowForUpdatingArtObject((prev) => !prev);
+        //                   setSelectedArtifactIDForUpdating(artifact._id);
+        //                 }}
+        //                 style={{
+        //                   position: "absolute",
+        //                   bottom: "10px",
+        //                   right: "10px",
+        //                   background: "transparent",
+        //                   border: "none",
+        //                   cursor: "pointer",
+        //                   zIndex: 1,
+        //                 }}
+        //               >
+        //                 <GoPencil size={30} />
+        //               </button>
+        //             </div>
+        //             <Card.Body>
+        //               <Card.Title>{artifact.nameOfThePainting}</Card.Title>
+        //               <Card.Text>Year: {artifact.year}</Card.Text>
+        //             </Card.Body>
+        //           </Card>
+        //         </Col>
+        //       ))}
+        //     </Row>
+        //   </Container>
+        // </div>
       )}
 
       {/* Free Space at the Bottom */}

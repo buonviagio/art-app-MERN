@@ -10,7 +10,9 @@ import {
     deleteArtObject,
     getAllFavoriteArtObjecsOfUserForProfilePage,
     updateArtObject,
-    getArtByID
+    getArtByID,
+    getArtObjectsBasedOnUserLikes,
+    getArtObjectsMostCommented
 } from "../controller/artsController.js";
 import multerUpload from "../middlewares/multer.js";
 import jwtAuth from "../middlewares/jwtAuth.js";
@@ -39,5 +41,9 @@ artsRouter.get("/getAllFavoritesForProfilePage", jwtAuth, getAllFavoriteArtObjec
 artsRouter.post("/updateArtObject", jwtAuth, multerUpload.single("artphoto"), updateArtObject);
 //get art object by ID
 artsRouter.get("/:id", jwtAuth, getArtByID);
+//get art objects based on user's likes
+artsRouter.get("/artObjects/favorited", getArtObjectsBasedOnUserLikes);
+//get art objects with the most comments
+artsRouter.get("/artObjects/commented", getArtObjectsMostCommented);
 
 export default artsRouter;  

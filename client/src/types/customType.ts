@@ -55,5 +55,6 @@ export type CommentsResponce = {
     userId: string
     userName: string
     createdAt: Date
+    updatedAt: Date
     commentId: string
 }

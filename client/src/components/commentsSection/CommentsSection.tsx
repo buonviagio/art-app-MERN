@@ -13,6 +13,7 @@ type CommentsSectionProps = {
   artditail: string;
 };
 function CommentsSection({ artditail }: CommentsSectionProps) {
+  console.log("CommentsSection Component");
   const { user } = useContext(AuthContext);
   const [comments, setComments] = useState<CommentsResponce[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -49,6 +50,8 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
         );
         if (response.ok) {
           console.log("response.ok");
+          setEditingCommentId(null);
+          getAllComentsForArtObject();
         }
       } else {
         console.log("you have to write some text");
@@ -127,6 +130,7 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
             userName: user.userName,
             createdAt: result.createdAt,
             commentId: result.commentId,
+            updatedAt: result.createdAt,
           };
           console.log("newUserComment :>> ", newUserComment);
           setComments([...comments, newUserComment]);
@@ -190,20 +194,29 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
         {comments.length ? (
           comments.map((comment, index) => (
             <div key={index} className="comment-item">
-              <div className="profile-icon">
-                {comment.avatar ? (
-                  <img
-                    src={comment.avatar}
-                    alt="Profile"
-                    className="profile-picture"
-                  />
-                ) : (
-                  <AccountCircle fontSize="large" sx={{ color: "#66ccff" }} />
-                )}
+              <div className="comment-header d-flex align-items-center">
+                <div className="profile-icon me-2">
+                  {comment.avatar ? (
+                    <img
+                      src={comment.avatar}
+                      alt="Profile"
+                      className="profile-picture"
+                    />
+                  ) : (
+                    <AccountCircle fontSize="large" sx={{ color: "#66ccff" }} />
+                  )}
+                </div>
+                {/* <p>By {comment.userName}</p> */}
+                <span className="comment-username fw-bold">
+                  {comment.userName}
+                </span>
               </div>
-              <p>By {comment.userName}</p>
-              <p>
+              <p className="comment-date text-muted">
                 Posted on: {new Date(comment.createdAt).toLocaleDateString()}
+                {comment.updatedAt !== comment.createdAt &&
+                  ` Last update:  ${new Date(
+                    comment.updatedAt
+                  ).toLocaleDateString()}`}
               </p>
 
               {/* Conditional Rendering for Comment Text or Textarea */}
@@ -213,23 +226,24 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
                     rows={3}
-                    style={{ width: "100%" }}
+                    // style={{ width: "100%" }}
+                    className="form-control"
                   />
                   <button
                     className="custom-button save-button"
                     onClick={() => handleUpdateComment(comment.commentId)}
                   >
-                    <GrUpdate size={20} />
+                    <GrUpdate size={25} />
                   </button>
                   <button
                     className="custom-button cancel-button"
                     onClick={() => setEditingCommentId(null)}
                   >
-                    <MdOutlineCancel size={25} />
+                    <MdOutlineCancel size={30} />
                   </button>
                 </div>
               ) : (
-                <p>{comment.text}</p>
+                <p className="comment-text">{comment.text}</p>
               )}
               {/* The end of the conditional Rendering for Comment Text or Textarea */}
               {user.userId === comment.userId && (

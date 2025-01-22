@@ -26,6 +26,7 @@ const createComment = async (request, response) => {
                 artId: comment.art,
                 text: comment.text,
                 createdAt: comment.created_at,
+                updatedAt: comment.updated_at,
                 commentId: comment._id,
             });
         }
@@ -37,7 +38,7 @@ const createComment = async (request, response) => {
 const getAllComments = async (request, response) => {
     try {
         const { artId } = request.params;
-
+        console.log('!!!!!!!!!!!!!!artId :>> ', artId);
         const comments = await CommentModel.find({ art: artId })
             .populate("user") // Populate user 
             // Latest comments first
@@ -50,6 +51,7 @@ const getAllComments = async (request, response) => {
                 artId: comment.art,
                 text: comment.text,
                 createdAt: comment.created_at,
+                updatedAt: comment.updated_at,
                 commentId: comment._id
             }));
             return response.status(200).json({
@@ -98,14 +100,23 @@ const changeComment = async (request, response) => {
             return response.status(403).json({ message: "You are unauthorized to edit this comment" });
         }
 
-        const updatedComment = await comment.updateOne(
-            { text: text },
-            {
-                updated_at: Date.now()
-            });
+        comment.text = text;
+        comment.updated_at = new Date();
+        comment.save();
 
-        if (updatedComment)
-            console.log("updatedComment", updatedComment);
+        return response.status(200).json({
+            message: "Comment was succesfully changes",
+            comment: comment
+        })
+        // code bellow does not work updated_at is not updated
+        // const updatedComment = await comment.updateOne(
+        //     { text: text },
+        //     {
+        //         updated_at: new Date()
+        //     });
+
+        // if (updatedComment)
+        //     console.log("updatedComment", updatedComment);
     } catch (error) {
         console.log('error, we can not update comment :>> ', error);
     }

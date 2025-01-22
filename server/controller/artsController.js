@@ -1,5 +1,6 @@
 import ArtsModel from "../models/artsModel.js"
 import UserModel from "../models/userModel.js";
+import CommentModel from "../models/commentModel.js"
 import { pictureUpload } from "../utils/pictureUpload.js";
 import { pictureDelete } from "../utils/pictureDelete.js";
 
@@ -40,12 +41,17 @@ const getArtByAuthorName = async (request, response) => {
 
 const getArtByStyle = async (request, response) => {
     const { style } = request.params;
-    console.log('style :>> ', style);
     try {
-        if (style) {
+        if (style !== "All styles") {
             const desiredArt = await ArtsModel.find({ style: style })
             return response.status(200).json({
                 message: `this is what you are looking for`,
+                desiredArt
+            })
+        } else if (style === "All styles") {
+            const desiredArt = await ArtsModel.find({});
+            return response.status(200).json({
+                message: `this is all styles`,
                 desiredArt
             })
         }
@@ -294,5 +300,73 @@ const getArtByID = async (request, response) => {
     }
 }
 
+const getArtObjectsBasedOnUserLikes = async (request, response) => {
+    try {
+        // Step 1: Populate the 'favorites' field to get the art objects
+        // Using lean() to convert to plain js
+        const users = await UserModel.find({}).populate('favorites').lean();
 
-export { getAllArts, getArtByAuthorName, getArtByStyle, uploadArtObject, getArtWithUser, addArtObjectToFavoitesOfUser, getAllFavoriteArtObjecsOfUser, deleteArtObject, getAllFavoriteArtObjecsOfUserForProfilePage, updateArtObject, getArtByID }
+        const mapCollection = new Map();
+
+        users.forEach((user) => {
+            user.favorites.forEach((art) => {
+                mapCollection.set(art._id.toString(), (mapCollection.get(art._id.toString()) || 0) + 1)
+            })
+        })
+
+        // Step2: Find all object, using lean() to perform operation on js object
+        const allArtsObjects = await ArtsModel.find({}).lean();
+
+        // Step 3: adding to each artObject amount of likes
+        const mostLikedArts = allArtsObjects.map((artObjects) => (
+            { ...artObjects, likes: mapCollection.get(artObjects._id.toString()) || 0 }
+        ));
+
+        // Step 4: sort all objects with likes
+        mostLikedArts.sort((obj1, obj2) => obj2.likes - obj1.likes);
+
+        return response.status(200).json({
+            message: "Most liked arrt objects",
+            mostLikedArts
+        })
+
+    } catch (error) {
+        console.log('error in the methos getArtObjectsBasedOnUserLikes:>> ', error);
+    }
+}
+
+const getArtObjectsMostCommented = async (request, response) => {
+    console.log("getArtObjectsMostCommented method");
+    try {
+        // Step 1: Populate the 'art' field to get the comments
+        // Using lean() to convert to plain js
+        const comments = await CommentModel.find({}).populate('art').lean();
+
+        const mapCollection = new Map();
+
+        comments.forEach((comment) => {
+            mapCollection.set(comment.art._id.toString(), (mapCollection.get(comment.art._id.toString()) || 0) + 1)
+        })
+
+        // Step2: Find all object, using lean() to perform operation on js object
+        const allArtsObjects = await ArtsModel.find({}).lean();
+
+        // Step 3: adding to each artObject amount of comments
+        const mostCommentedArts = allArtsObjects.map((artObjects) => (
+            { ...artObjects, amountOfComments: mapCollection.get(artObjects._id.toString()) || 0 }
+        ));
+
+        // Step 4: sort all objects with likes
+        mostCommentedArts.sort((obj1, obj2) => obj2.amountOfComments - obj1.amountOfComments);
+
+        return response.status(200).json({
+            message: "Most commented arts objects",
+            mostCommentedArts
+        })
+
+    } catch (error) {
+        console.log('error in the methos getArtObjectsBasedOnUserLikes:>> ', error);
+    }
+}
+
+export { getAllArts, getArtByAuthorName, getArtByStyle, uploadArtObject, getArtWithUser, addArtObjectToFavoitesOfUser, getAllFavoriteArtObjecsOfUser, deleteArtObject, getAllFavoriteArtObjecsOfUserForProfilePage, updateArtObject, getArtByID, getArtObjectsBasedOnUserLikes, getArtObjectsMostCommented }
