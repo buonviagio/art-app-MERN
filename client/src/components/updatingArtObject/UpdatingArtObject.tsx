@@ -1,20 +1,13 @@
 import { useState } from "react";
-import { Alert, Modal } from "react-bootstrap";
+import { Alert, ProgressBar } from "react-bootstrap";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import * as formik from "formik";
 import * as yup from "yup";
 import ModalForSuccessfullyUploadArtObject from "../modalWindows/ModalForSuccessfullyUploadArtObject";
+import { useLocation, useNavigate } from "react-router";
+import { FaBackspace } from "react-icons/fa";
 
-type UpdatingArtObjectProps = {
-  setModalWindowForUpdatingArtObject: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
-  selectedArtifactIDForUpdating: string;
-};
-export default function UpdatingArtObject({
-  setModalWindowForUpdatingArtObject,
-  selectedArtifactIDForUpdating,
-}: UpdatingArtObjectProps) {
+export default function UpdatingArtObject() {
   const [returnedArtObject, setReturnedArtObject] = useState<{
     picture: { secure_url: string };
     nameOfThePainting: string;
@@ -23,9 +16,13 @@ export default function UpdatingArtObject({
     year: number;
     location: string;
   } | null>(null);
+  // here we assign message from server responce and pass info to the modal window
   const [returnedMessage, setReturnedMessage] = useState("");
+  //after successful response rom server open maodal window and showing art objevt which has been recently added
   const [modalShow, setModalShow] = useState(false);
+  // show alert if the user try submit empty form
   const [alert, setAlert] = useState(false);
+  // this object initialize Formic schema and (infare type - выводит тип) of the argument value in hundleSubmit(value)
   const artObject = {
     art: "",
     author: "",
@@ -36,8 +33,28 @@ export default function UpdatingArtObject({
     artphoto: null,
     terms: false,
   };
+  // ProgressBar bootstrap
+  const [progressVisible, setProgressVisible] = useState(false);
+  // Track progress value
+  const [progressValue, setProgressValue] = useState(0);
+  //from react router, we take artId from state object
+  const location = useLocation();
+  const { artifactId } = location.state;
+  //from react router, we navigate user to the profile page
+  const navigate = useNavigate();
+  // Formik
+  const { Formik } = formik;
+
+  // this function returns the user to the page where he came from
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
+  //typeof infere type of the object, we have
+  // { art: "", artphoto: null, terms: false } it infers them to => {art: string; artphoto:null; terms: boolean}
   const hundleSubmit = async (values: typeof artObject) => {
-    console.log("VALUES :>> ", values);
+    // We call this function in order to define, user type something in the form excluding terms
+    // we make it in order to, not submit empty form, one of all fiedls must be filled out
     setAlert(false);
     if (compareObjects(values, artObject, ["terms"])) {
       setAlert(true);
@@ -45,7 +62,7 @@ export default function UpdatingArtObject({
     }
 
     const formdata = new FormData();
-    // we check if user dis not attach photo, it will be null, instaed we send empty string
+    // we check if user does not attach photo, it will be null, instaed we send empty string
     formdata.append("artphoto", values.artphoto ? values.artphoto : "");
     formdata.append("artname", values.art);
     formdata.append("author", values.author);
@@ -53,7 +70,7 @@ export default function UpdatingArtObject({
     formdata.append("year", values.year);
     formdata.append("location", values.location);
     formdata.append("description", values.description);
-    formdata.append("artifactId", selectedArtifactIDForUpdating);
+    formdata.append("artifactId", artifactId);
 
     const token = localStorage.getItem("token");
 
@@ -62,28 +79,66 @@ export default function UpdatingArtObject({
       headers: { Authorization: `Bearer ${token}` },
       body: formdata,
     };
+
+    // Show progress bar
+    setProgressVisible(true);
+    // Reset progress bar
+    setProgressValue(0);
+    // Animate progress bar from 1 to 100
+    // we can define time of performing loader
+    const stepDuration = 50;
+    // increment per step
+    const increment = 1;
+
+    // we create promese, that returns nothing. In promise executor pass function with one argument resolve
+    // in this function we use setInterval in order to every stepDuration time we set progressValue variable
+    // with value wich user observes on the page as loader, when the value reach more then 100, resolve function
+    // is called, and promise ends
+    const progressAnimation = new Promise<void>((resolve) => {
+      const interval = setInterval(() => {
+        setProgressValue((prev) => {
+          const nextValue = prev + increment;
+          if (nextValue >= 100) {
+            clearInterval(interval);
+            // Resolve when animation is complete
+            resolve();
+            return 100;
+          }
+          return nextValue;
+        });
+      }, stepDuration);
+    });
+
     try {
       const response = await fetch(
         "http://localhost:5000/api/arts/updateArtObject",
         requestOptions
       );
-      if (!response.ok) {
-        throw new Error("something went wrong in the resoponse");
-      }
+
+      // Wait for both the progress animation and the fetch request we are waiting, in case if the response comes
+      // faster then loader ends, if
+      await Promise.all([
+        progressAnimation,
+        response.ok ? null : Promise.reject(new Error("Response failed")),
+      ]);
+
       if (response.ok) {
         const result = await response.json();
-        console.log("result :>> ", result);
         setReturnedArtObject(result.artObject);
         setReturnedMessage(result.message);
         setModalShow(true);
-        //setModalWindowForUpdatingArtObject((prev) => !prev);
-        // we have to save picture in the data base
       }
     } catch (error) {
-      console.log("error :>> ", error);
+      console.log("error in the method hundleSubmit() :>> ", error);
     }
   };
 
+  // This is helper function compares two objects of the same type, while ignoring  a specific types,
+  // in our case TERMS it can be diff.
+  // <T extends Record<string, any>>: The function works with objects where keys are strings and values can be of any type.
+  // Object.keys() generates an array of keys
+  // filter() filters out keys that are in array excludeKeys
+  // every() ensures that for all remaining keys, values are equal
   function compareObjects<T extends Record<string, any>>(
     obj1: T,
     obj2: T,
@@ -98,8 +153,8 @@ export default function UpdatingArtObject({
     );
   }
 
-  const { Formik } = formik;
-  //const errorMessage = "This Field is requered";
+  // this schema defines validation rules using YUP
+  // if the object (violates-нарушить) any rules,YUP will throw an error
   const schema = yup.object().shape({
     art: yup.string().optional(),
     author: yup.string().optional(),
@@ -112,11 +167,10 @@ export default function UpdatingArtObject({
       .optional()
       .nullable()
       .test(
-        "fileType",
+        "fileType", // Test name.
         "Unsupported file format. Only PNG, JPEG, and WEBP are allowed.",
         (value) => {
           return (
-            // value &&
             value === null ||
             (value instanceof File &&
               ["image/png", "image/jpeg", "image/webp"].includes(value.type))
@@ -127,50 +181,66 @@ export default function UpdatingArtObject({
   });
 
   return (
-    <Modal
-      show={true}
-      onHide={() => setModalWindowForUpdatingArtObject((prev) => !prev)}
-      centered
-      size="lg"
-    >
-      {/*  <Modal.Dialog> */}
-      {/* <Modal.Header closeButton>
-          <Modal.Title className="text-primary">
-            You can change the Art Object
-          </Modal.Title>
-        </Modal.Header>
- */}
+    <div>
       {/* <Modal.Body> */}
-      <div>
-        {modalShow && (
-          <ModalForSuccessfullyUploadArtObject
-            setModalShow={setModalShow}
-            returnedArtObject={returnedArtObject ?? undefined}
-            returnedMessage={returnedMessage}
-          />
-        )}
-        {alert && <Alert variant={"warning"}>Fill in at least one field</Alert>}
+      {modalShow && (
+        <ModalForSuccessfullyUploadArtObject
+          setModalShow={setModalShow}
+          returnedArtObject={returnedArtObject ?? undefined}
+          returnedMessage={returnedMessage}
+        />
+      )}
+      {alert && <Alert variant={"warning"}>Fill in at least one field</Alert>}
+      {/* Conditional rendering */}
+      {progressVisible ? (
+        <div className="progress-container">
+          <div className="progress-container-child">
+            <ProgressBar
+              animated
+              now={progressValue}
+              label={`${progressValue}%`}
+              style={{ width: "100%" }}
+            />
+          </div>
+        </div>
+      ) : (
         <Container
           className="d-flex justify-content-center align-items-center"
           style={{ minHeight: "100vh", minWidth: "100%", marginTop: "50px" }}
         >
           <Row className="w-100">
+            {/* Back Button */}
+            <div className="mb-3">
+              <button
+                onClick={handleBackClick}
+                className="btn btn-outline-primary d-flex align-items-center"
+              >
+                <FaBackspace className="me-2" />
+                Go Back
+              </button>
+            </div>
             <Col xs={12} md={10} lg={8} xl={8} className="mx-auto">
               <div className="p-4 border rounded bg-light shadow">
-                <h2 className="text-center mb-4">New Art Artifact</h2>
+                <h2 className="text-center mb-4">Artifact update</h2>
                 {/* Start the form */}
+                {/* Formik is a wrappeer that handles form state, validation,
+                submition, it take properties... Formik component uses RENDER PROPS PATTERN  - technique in React, 
+                a component shares its state or logic with other components by passing a function as a prop.*/}
                 <Formik
+                  // Links the Yup validation schema for validating the form
                   validationSchema={schema}
+                  // Function wich will be executed, when user submit form
                   onSubmit={hundleSubmit}
+                  // Initial form values
                   initialValues={artObject}
                 >
                   {({
-                    handleSubmit,
-                    handleChange,
-                    setFieldValue,
-                    values,
-                    touched,
-                    errors,
+                    handleSubmit, // Function to handle form submission
+                    handleChange, // Function to handle field changes
+                    setFieldValue, // Function to programmatically set field values
+                    values, // Object containing the current values of all fields
+                    touched, // Tracks whether fields have been "touched"
+                    errors, // Object containing validation errors for fields
                   }) => (
                     <Form noValidate onSubmit={handleSubmit}>
                       <Row className="mb-3">
@@ -296,9 +366,7 @@ export default function UpdatingArtObject({
                               </option>
                             </optgroup>
                           </Form.Select>
-                          {/* <Form.Control.Feedback type="invalid">
-                        {errors.style}
-                      </Form.Control.Feedback> */}
+
                           {touched.style && errors.style && (
                             <Form.Control.Feedback type="invalid">
                               {errors.style}
@@ -448,20 +516,7 @@ export default function UpdatingArtObject({
             </Col>
           </Row>
         </Container>
-      </div>
-      {/*  </Modal.Body> */}
-
-      <Modal.Footer>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            setModalWindowForUpdatingArtObject((prev) => !prev);
-          }}
-        >
-          Close
-        </Button>
-      </Modal.Footer>
-      {/* </Modal.Dialog> */}
-    </Modal>
+      )}
+    </div>
   );
 }

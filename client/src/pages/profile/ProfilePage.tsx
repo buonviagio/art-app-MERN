@@ -1,42 +1,30 @@
 import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
-import {
-  ArtsObjectResponce,
-  GetProfileOkResponse,
-  User,
-} from "../../types/customType";
-import {
-  Button,
-  Col,
-  Container,
-  Form,
-  Row,
-  Image,
-  Card,
-  Carousel,
-} from "react-bootstrap";
+import { ArtsObjectResponce } from "../../types/customType";
+import { Button, Form, Image } from "react-bootstrap";
 import "./ProfilePage.css";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { GoPencil } from "react-icons/go";
 import CarouseForFavoritesl from "../../components/carouselForFavoriteArtObjects/CarouseForFavoritesl";
 import { AuthContext } from "../../context/AuthContext";
-import UpdatingArtObject from "../../components/updatingArtObject/UpdatingArtObject";
-import { FaHeart } from "react-icons/fa";
 import Masonry from "react-masonry-css";
+import { NavLink, useNavigate } from "react-router";
 
 export default function ProfilePage() {
-  const { setUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const [selectedFile, setSelectedFile] = useState<File | string>("");
   //const [newUser, setNewUser] = useState<User | null>(null);
   const [artsObjectsWhichPostedUser, setArtsObjectsWhichPostedUser] = useState<
     ArtsObjectResponce[] | null
   >(null);
-  const [userProfile, setUserProfile] = useState<User | null>(null);
+  /* const [userProfile, setUserProfile] = useState<ExistingUserInDB>({
+    userName: "Guest",
+    email: "",
+    userId: "",
+  }); */
   const [favorites, setFavorites] = useState<ArtsObjectResponce[] | null>(null);
-  const [modalWindowForUpdatingArtObject, setModalWindowForUpdatingArtObject] =
-    useState(false);
-  const [selectedArtifactIDForUpdating, setSelectedArtifactIDForUpdating] =
-    useState("");
   const [showUploadSection, setShowUploadSection] = useState(false);
+  const navigate = useNavigate();
+  const [goTotheCart, setGoTotheCart] = useState(false);
 
   const breakpointColumnsObj = {
     default: 3,
@@ -61,6 +49,9 @@ export default function ProfilePage() {
       if (response.ok) {
         const result = await response.json();
         setFavorites(result.favorites);
+        setGoTotheCart(true);
+      } else {
+        setGoTotheCart(true);
       }
     } catch (error) {
       console.log("error during fetching favorites art objects :>> ", error);
@@ -131,47 +122,13 @@ export default function ProfilePage() {
         console.log("result after deleting:>> ", result);
         //setFavorites(result.favorites);
         //WE NEED TO UPDATE THE PAGE AFTER DELETE
-        fetchFavorites();
+        //fetchFavorites();
+        getAllArtsObjectWhichUserPosted();
       } else {
         console.log("we can not delete this item object");
       }
     } catch (error) {
       console.log("Error was accures during deleting ArtObject :>> ", error);
-    }
-  };
-
-  const getProfileInfo = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.log("you need login first");
-    }
-    if (token) {
-      const myHeaders = new Headers();
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
-      const requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-      };
-
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/user/profile",
-          requestOptions
-        );
-        if (!response.ok) {
-          console.log("login again ... redirect user to user page ");
-        }
-        if (response.ok) {
-          const result = (await response.json()) as GetProfileOkResponse;
-          setUserProfile(result.userProfile);
-        }
-      } catch (error) {
-        console.log(
-          "Error, request to the server is not successfull :>> ",
-          error
-        );
-      }
     }
   };
 
@@ -202,16 +159,15 @@ export default function ProfilePage() {
       }
       if (response.ok) {
         const result = await response.json();
-        //setNewUser({ ...newUser!, userImage: result.avatar.secure_url });
-        //console.log("newUser :>> ", newUser);
-        console.log("RESULT AFTER UPLOADING AVATAR :>> ", result);
+        //set user variable for auth conext
         setUser((prevUser) => ({
           ...prevUser,
           avatar: { secure_url: result.avatar.secure_url },
         }));
+        setShowUploadSection(!showUploadSection);
       }
     } catch (error) {
-      console.log("error :>> ", error);
+      console.log("error with uploading avatar foto:>> ", error);
     }
   };
 
@@ -239,44 +195,69 @@ export default function ProfilePage() {
     } catch (error) {}
   };
 
+  const handleCardClick = (artifact: ArtsObjectResponce) => {
+    const scrollPosition = document.documentElement.scrollTop;
+    sessionStorage.setItem(
+      "scrollPositionProgilePage",
+      scrollPosition.toString()
+    );
+    //navigating to detailed page
+    navigate(`/art/${artifact._id}`);
+  };
+
   useEffect(() => {
-    getProfileInfo();
     getAllArtsObjectWhichUserPosted();
     fetchFavorites();
   }, []);
 
+  useEffect(() => {
+    const savedScrollPosition = sessionStorage.getItem(
+      "scrollPositionProgilePage"
+    );
+
+    if (savedScrollPosition) {
+      window.scrollTo(0, parseInt(savedScrollPosition, 10));
+      setTimeout(() => {
+        sessionStorage.removeItem("scrollPositionProgilePage");
+      }, 1000);
+    }
+  }, [goTotheCart]);
+
   return (
     <div className="profile-page-container text-center py-4">
-      {modalWindowForUpdatingArtObject && (
-        <UpdatingArtObject
-          setModalWindowForUpdatingArtObject={
-            setModalWindowForUpdatingArtObject
-          }
-          selectedArtifactIDForUpdating={selectedArtifactIDForUpdating}
-        />
-      )}
       <h1 className="text-primary mb-4">Profile Page</h1>
 
       {/* User Information Section */}
-      {userProfile && (
+      {user && (
         <div
           className="user-info-section card mx-auto p-4 mb-5"
           style={{ maxWidth: "500px" }}
         >
           <Image
-            src={userProfile.avatar.secure_url}
+            src={
+              user.avatar?.secure_url ||
+              "https://res.cloudinary.com/dzbkg3xj2/image/upload/v1737631272/projrct-app/woymynhnvyx2mn27lhxc.jpg"
+            }
             roundedCircle
             className="mb-3"
             style={{ width: "120px", height: "120px", objectFit: "cover" }}
           />
-          <h3 className="text-muted mb-1">{userProfile.userName}</h3>
-          <p className="text-muted">{userProfile.email}</p>
-          <Button
-            variant="secondary"
-            onClick={() => setShowUploadSection(!showUploadSection)}
-          >
-            {showUploadSection ? "Cancel" : "Add Avatar"}
-          </Button>
+          <h3 className="text-muted mb-1">{user.userName}</h3>
+          <p className="text-muted">{user.email}</p>
+
+          {/* Button Container */}
+          <div className="button-container">
+            <NavLink to="/addart" className="custom-button-user-info">
+              Add Art Object
+            </NavLink>
+            <Button
+              /* variant="secondary" */
+              className="custom-button-user-info"
+              onClick={() => setShowUploadSection(!showUploadSection)}
+            >
+              {showUploadSection ? "Cancel" : "Change Avatar"}
+            </Button>
+          </div>
         </div>
       )}
 
@@ -304,7 +285,14 @@ export default function ProfilePage() {
 
       {/* Favorites Carousel Section */}
       <div className="favorites-section mb-5">
-        <h2 className="text-primary mb-3">Your Favorites</h2>
+        {favorites?.length != 0 ? (
+          <h2 className="text-primary mb-3">Your Favorites</h2>
+        ) : (
+          <h2 className="text-primary mb-3">
+            You do not have any favorite art objects
+          </h2>
+        )}
+
         <CarouseForFavoritesl
           favorites={favorites}
           handleFavoriteToggle={handleFavoriteToggle}
@@ -314,7 +302,14 @@ export default function ProfilePage() {
       {/* User's Posted Arts Section */}
       {artsObjectsWhichPostedUser && (
         <div className="posted-arts-section">
-          <h2 className="text-primary mb-4">Your Posted Arts</h2>
+          {artsObjectsWhichPostedUser?.length != 0 ? (
+            <h2 className="text-primary mb-4">Your Posted Arts</h2>
+          ) : (
+            <h2 className="text-primary mb-4">
+              You didn't post any art object
+            </h2>
+          )}
+
           <Masonry
             breakpointCols={breakpointColumnsObj}
             className="my-masonry-grid"
@@ -327,9 +322,13 @@ export default function ProfilePage() {
                     src={artifact.picture.secure_url}
                     alt={artifact.nameOfThePainting}
                     className="masonry-img"
+                    onClick={() => {
+                      handleCardClick(artifact);
+                    }}
+                    style={{ cursor: "pointer" }}
                   />
                   <button
-                    className="custom-button"
+                    className="custom-button-posted-art"
                     onClick={() => handleDeleteToggle(artifact._id)}
                     style={{
                       position: "absolute",
@@ -344,10 +343,11 @@ export default function ProfilePage() {
                     <RiDeleteBin6Line size={30} />
                   </button>
                   <button
-                    className="custom-button"
+                    className="custom-button-posted-art"
                     onClick={() => {
-                      setModalWindowForUpdatingArtObject((prev) => !prev);
-                      setSelectedArtifactIDForUpdating(artifact._id);
+                      navigate("/updateart", {
+                        state: { artifactId: artifact._id },
+                      });
                     }}
                     style={{
                       position: "absolute",
@@ -370,196 +370,9 @@ export default function ProfilePage() {
             ))}
           </Masonry>
         </div>
-
-        // <div className="posted-arts-section">
-        //   <h2 className="text-primary mb-4">Your Posted Arts</h2>
-        //   <Container fluid>
-        //     <Row xs={1} md={2} xl={3} className="g-4">
-        //       {artsObjectsWhichPostedUser.map((artifact) => (
-        //         <Col key={artifact._id}>
-        //           <Card
-        //             className="custom-card border-0 shadow-sm"
-        //             key={"Primary"}
-        //           >
-        //             <div style={{ position: "relative" }}>
-        //               <Card.Img
-        //                 variant="top"
-        //                 src={artifact.picture.secure_url}
-        //                 className="custom-img"
-        //                 style={{ height: "200px", objectFit: "cover" }}
-        //               />
-        //               <button
-        //                 className="custom-button"
-        //                 onClick={() => handleDeleteToggle(artifact._id)}
-        //                 style={{
-        //                   position: "absolute",
-        //                   top: "10px",
-        //                   right: "10px",
-        //                   background: "transparent",
-        //                   border: "none",
-        //                   cursor: "pointer",
-        //                   zIndex: 1,
-        //                 }}
-        //               >
-        //                 <RiDeleteBin6Line size={30} />
-        //               </button>
-        //               <button
-        //                 className="custom-button"
-        //                 onClick={() => {
-        //                   setModalWindowForUpdatingArtObject((prev) => !prev);
-        //                   setSelectedArtifactIDForUpdating(artifact._id);
-        //                 }}
-        //                 style={{
-        //                   position: "absolute",
-        //                   bottom: "10px",
-        //                   right: "10px",
-        //                   background: "transparent",
-        //                   border: "none",
-        //                   cursor: "pointer",
-        //                   zIndex: 1,
-        //                 }}
-        //               >
-        //                 <GoPencil size={30} />
-        //               </button>
-        //             </div>
-        //             <Card.Body>
-        //               <Card.Title>{artifact.nameOfThePainting}</Card.Title>
-        //               <Card.Text>Year: {artifact.year}</Card.Text>
-        //             </Card.Body>
-        //           </Card>
-        //         </Col>
-        //       ))}
-        //     </Row>
-        //   </Container>
-        // </div>
       )}
-
       {/* Free Space at the Bottom */}
       <div style={{ height: "50px" }}></div>
     </div>
   );
-
-  /* return (
-    <div>
-      <h1 className="text-primary">Profile Page</h1>
-      {modalWindowForUpdatingArtObject && (
-        <UpdatingArtObject
-          setModalWindowForUpdatingArtObject={
-            setModalWindowForUpdatingArtObject
-          }
-          selectedArtifactIDForUpdating={selectedArtifactIDForUpdating}
-        />
-      )}
-      <div>
-        {userProfile && (
-          <div>
-            <p className="text-muted">Name: {userProfile.userName}</p>
-            <p className="text-muted">Email: {userProfile.email}</p>
-            <Container>
-              <Row>
-                <Col xs={6} md={4}>
-                  <Image src={userProfile.avatar.secure_url} roundedCircle />
-                </Col>
-              </Row>
-            </Container>
-          </div>
-        )}
-      </div>
-      <Form onSubmit={hundleImageSubmit}>
-        <Row>
-          <Col>
-            <Form.Group controlId="formFile" className="mb-3">
-              <Form.Label>Upload your Foto here</Form.Label>
-              <Form.Control
-                type="file"
-                onChange={handleAttachImage}
-                accept="image/png, image/jpeg, image/png, image/webp"
-                className="w-100"
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Button variant="primary" type="submit">
-              Upload Foto
-            </Button>
-          </Col>
-        </Row>
-      </Form>
-      {artsObjectsWhichPostedUser && (
-        <div className="wrapper-for-container-with-arts-objects-of-user">
-          <h3 className="text-primary">Arts that you posted</h3>
-          <div className="container-with-arts-objects-of-user">
-            <Container fluid className="my-4 px-4">
-              <Row xs={1} md={2} xl={3} className="g-4">
-                {artsObjectsWhichPostedUser &&
-                  artsObjectsWhichPostedUser.map((artifact) => (
-                    <Col key={artifact._id}>
-                      <Card border="light" className="custom-card">
-                        <div style={{ position: "relative" }}>
-                          <Card.Img
-                            variant="top"
-                            src={artifact.picture.secure_url}
-                            className="custom-img"
-                          />
-                          <button
-                            className="custom-button"
-                            onClick={() => {
-                              handleDeleteToggle(artifact._id);
-                            }}
-                            style={{
-                              position: "absolute",
-                              top: "10px",
-                              right: "10px",
-                              background: "transparent",
-                              border: "none",
-                              cursor: "pointer",
-                              zIndex: 1,
-                            }}
-                          >
-                            <RiDeleteBin6Line size={30} />
-                          </button>
-                          {
-                            <button
-                              className="custom-button"
-                              onClick={() => {
-                                //handleFavoriteToggle(artifact._id);
-                                setModalWindowForUpdatingArtObject(
-                                  (prev) => !prev
-                                );
-                                setSelectedArtifactIDForUpdating(artifact._id);
-                              }}
-                              style={{
-                                position: "absolute",
-                                bottom: "-60px",
-                                right: "10px",
-                                background: "transparent",
-                                border: "none",
-                                cursor: "pointer",
-                                zIndex: 1,
-                              }}
-                            >
-                              <GoPencil size={30} />
-                            </button>
-                          }
-                        </div>
-                        <Card.Body>
-                          <Card.Title>{artifact.nameOfThePainting}</Card.Title>
-                          <Card.Text>Year {artifact.year}</Card.Text>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                  ))}
-              </Row>
-            </Container>
-          </div>
-        </div>
-      )}
-      <CarouseForFavoritesl
-        favorites={favorites}
-        handleFavoriteToggle={handleFavoriteToggle}
-      />
-    </div>
-  ); */
 }

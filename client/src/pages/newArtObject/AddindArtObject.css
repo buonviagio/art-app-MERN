@@ -1,0 +1,13 @@
+/* this code affect in the same classes in UpdatingArtObject */
+
+.progress-container {
+  margin-top: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.progress-container-child {
+  min-width: 450px;
+}

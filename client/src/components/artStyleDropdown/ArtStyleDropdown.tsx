@@ -1,4 +1,4 @@
-import { Dropdown, Row, Col } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { Dispatch, SetStateAction, useState } from "react";
 import "./ArtStyleDropDropdown.css";
 import { ArtsObjectResponce } from "../../types/customType";
@@ -59,33 +59,29 @@ const ArtStyleDropdown = ({ setAllArtifacts }: ArtStyleDropdownProps) => {
   };
 
   return (
-    <Row className="my-3">
-      <Col>
-        <Dropdown>
-          <Dropdown.Toggle variant="primary" id="art-style-dropdown">
-            {selectedStyle}
-          </Dropdown.Toggle>
+    <Dropdown>
+      <Dropdown.Toggle variant="primary" id="art-style-dropdown">
+        {selectedStyle}
+      </Dropdown.Toggle>
 
-          <Dropdown.Menu>
-            <Dropdown.Item disabled>Select an art style...</Dropdown.Item>
-            {artStyles.map((group, groupIndex) => (
-              <div key={groupIndex}>
-                <Dropdown.Header>{group.label}</Dropdown.Header>
-                {group.options.map((style, styleIndex) => (
-                  <Dropdown.Item
-                    key={styleIndex}
-                    onClick={() => handleSelect(style)}
-                  >
-                    {style}
-                  </Dropdown.Item>
-                ))}
-                {groupIndex < artStyles.length - 1 && <Dropdown.Divider />}
-              </div>
+      <Dropdown.Menu>
+        <Dropdown.Item disabled>Select an art style...</Dropdown.Item>
+        {artStyles.map((group, groupIndex) => (
+          <div key={groupIndex}>
+            <Dropdown.Header>{group.label}</Dropdown.Header>
+            {group.options.map((style, styleIndex) => (
+              <Dropdown.Item
+                key={styleIndex}
+                onClick={() => handleSelect(style)}
+              >
+                {style}
+              </Dropdown.Item>
             ))}
-          </Dropdown.Menu>
-        </Dropdown>
-      </Col>
-    </Row>
+            {groupIndex < artStyles.length - 1 && <Dropdown.Divider />}
+          </div>
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
   );
 };
 

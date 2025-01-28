@@ -3,11 +3,17 @@ import UserModel from "../models/userModel.js";
 import CommentModel from "../models/commentModel.js"
 import { pictureUpload } from "../utils/pictureUpload.js";
 import { pictureDelete } from "../utils/pictureDelete.js";
+import { request } from "http";
 
 const getAllArts = async (request, response) => {
-
+    console.log("getAllArts Method");
     try {
         const allArts = await ArtsModel.find({});
+        // recieve arts object in random sequence 
+        // const allArts = await ArtsModel.aggregate([
+        //     //  aggregation stage in Mongoose
+        //     { $sample: { size: 50 } }
+        // ]);
 
         if (allArts.length === 0) {
             return response.status(400).json({
@@ -369,4 +375,49 @@ const getArtObjectsMostCommented = async (request, response) => {
     }
 }
 
-export { getAllArts, getArtByAuthorName, getArtByStyle, uploadArtObject, getArtWithUser, addArtObjectToFavoitesOfUser, getAllFavoriteArtObjecsOfUser, deleteArtObject, getAllFavoriteArtObjecsOfUserForProfilePage, updateArtObject, getArtByID, getArtObjectsBasedOnUserLikes, getArtObjectsMostCommented }
+const getArtObjectsDescendingSequence = async (request, response) => {
+
+    try {
+        // getting all art objects sorted by year in descending order -1
+        const arts = await ArtsModel.find().sort({ year: -1 });
+
+        if (arts) return response.status(200).json({
+            message: "Arts in descending sequence",
+            arts
+        });
+    } catch (error) {
+        console.log("Error fetching arts:", error);
+    }
+}
+
+const getArtObjectsAscendingSequence = async (request, response) => {
+
+    try {
+        // getting all art objects sorted by year in descending order -1
+        const arts = await ArtsModel.find().sort({ year: 1 });
+
+        if (arts) return response.status(200).json({
+            message: "Arts in descending sequence",
+            arts
+        });
+    } catch (error) {
+        console.log("Error fetching arts:", error);
+    }
+}
+
+const getArtObjectsByItsName = async (request, response) => {
+    const { nameOfArt } = request.params;
+    try {
+        if (nameOfArt) {
+            const desiredArt = await ArtsModel.find({ nameOfThePainting: { $regex: nameOfArt, $options: 'i' } })
+            return response.status(200).json({
+                message: `this is what you are looking for`,
+                desiredArt
+            })
+        }
+    } catch (error) {
+        console.log('error getArtObjectsByItsName :>> ', error);
+    }
+}
+
+export { getAllArts, getArtByAuthorName, getArtByStyle, uploadArtObject, getArtWithUser, addArtObjectToFavoitesOfUser, getAllFavoriteArtObjecsOfUser, deleteArtObject, getAllFavoriteArtObjecsOfUserForProfilePage, updateArtObject, getArtByID, getArtObjectsBasedOnUserLikes, getArtObjectsMostCommented, getArtObjectsDescendingSequence, getArtObjectsAscendingSequence, getArtObjectsByItsName }

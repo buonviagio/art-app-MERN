@@ -14,7 +14,6 @@ export default function CarouseForFavoritesl({
   const [index, setIndex] = useState(0);
 
   const handleSelect = (selectedIndex: number) => {
-    console.log("selectedIndex :>> ", selectedIndex);
     setIndex(selectedIndex);
   };
 

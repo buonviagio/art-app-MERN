@@ -38,7 +38,6 @@ const createComment = async (request, response) => {
 const getAllComments = async (request, response) => {
     try {
         const { artId } = request.params;
-        console.log('!!!!!!!!!!!!!!artId :>> ', artId);
         const comments = await CommentModel.find({ art: artId })
             .populate("user") // Populate user 
             // Latest comments first

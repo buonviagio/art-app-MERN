@@ -33,10 +33,14 @@ export const AuthContext = createContext<AuthContextType>(
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<ExistingUserInDB>({
+  /* const [user, setUser] = useState<ExistingUserInDB>({
     userName: "Guest",
     email: "",
-  });
+    userId: "",
+  }); */
+  const [user, setUser] = useState<ExistingUserInDB>(
+    AuthContextInitialValue.user
+  );
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -96,6 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser({
       userName: "Guest",
       email: "",
+      userId: "",
     });
     setLoading(true);
   };

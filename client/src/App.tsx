@@ -1,5 +1,5 @@
 //import "bootstrap/dist/css/bootstrap.min.css";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+import { Outlet, Route, Routes } from "react-router";
 import "./App.css";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/login/LoginPage";
@@ -10,44 +10,9 @@ import ProtectedRouteForProfilePage from "./protectedRoutes/ProtectedRouteForPro
 import ProfilePage from "./pages/profile/ProfilePage";
 import AddingArtObject from "./pages/newArtObject/AddingArtObject";
 import DetailsPage from "./pages/detailsPage/DetailsPage";
+import UpdatingArtObject from "./components/updatingArtObject/UpdatingArtObject";
 
-/* const Root = () => {
-  return (
-    <>
-      <MenuAppBar />
-      <Outlet />
-    </>
-  );
-};
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<Root />}>
-      <Route index element={<HomePage />} />
-      <Route path="login" element={<LoginPage />} />
-      <Route path="register" element={<RegisterPage />} />
-      <Route
-        path="countries/:country"
-        element={
-          <ProtectedRoute>
-            <CountryPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="profile"
-        element={
-          <ProtectedRouteForProfilePage>
-            <ProfilePage />
-          </ProtectedRouteForProfilePage>
-        }
-      />
-
-      <Route path="*" element={<ErrorPage />} />
-    </Route>
-  )
-); */
-
+/* RENSER PROPS PATTERN */
 const Root = () => {
   return (
     <>
@@ -66,6 +31,7 @@ function App() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="addart" element={<AddingArtObject />} />
+        <Route path="updateart" element={<UpdatingArtObject />} />
         <Route path="art/:artditail" element={<DetailsPage />} />
         <Route
           path="profile"

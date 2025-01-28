@@ -15,14 +15,9 @@ export default function DetailsPage() {
   };
 
   const fetchArtDetails = async () => {
-    const token = localStorage.getItem("token");
     try {
-      const myHeaders = new Headers();
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
       const requestOptions = {
         method: "GET",
-        headers: myHeaders,
       };
       const response = await fetch(
         `http://localhost:5000/api/arts/${artditail}`,
@@ -30,7 +25,6 @@ export default function DetailsPage() {
       );
       if (response.ok) {
         const result = await response.json();
-        // console.log("result :>> ", result.desiredArt);
         setArtDetails(result.desiredArt);
       } else {
         console.error("Failed to fetch art details");
@@ -87,7 +81,7 @@ export default function DetailsPage() {
         </div>
       </div>
       <div className="comments-section">
-        <CommentsSection artditail={artditail} />
+        <CommentsSection artditail={artditail!} />
       </div>
     </div>
   );

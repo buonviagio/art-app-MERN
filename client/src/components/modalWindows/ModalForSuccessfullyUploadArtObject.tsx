@@ -1,6 +1,7 @@
 import { Card } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { useNavigate } from "react-router";
 
 interface ModalForSuccessfullyUploadArtObjectProps {
   setModalShow: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,19 +34,26 @@ function ModalForSuccessfullyUploadArtObject({
   returnedArtObject = defaultArtObject,
   returnedMessage,
 }: ModalForSuccessfullyUploadArtObjectProps) {
+  const navigate = useNavigate();
   return (
-    <Modal show={true} onHide={() => setModalShow((prev) => !prev)} centered>
+    <Modal
+      show={true}
+      onHide={() => {
+        setModalShow((prev) => !prev);
+        navigate("/profile");
+      }}
+      centered
+    >
       <Modal.Dialog>
         <Modal.Header closeButton>
           <Modal.Title>{returnedMessage}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
-          <Card border="light" className="custom-card">
+          <Card border="light">
             <Card.Img
               variant="top"
               src={returnedArtObject.picture.secure_url}
-              className="custom-img"
             />
             <Card.Body>
               <Card.Title>{returnedArtObject.nameOfThePainting}</Card.Title>
@@ -68,6 +76,7 @@ function ModalForSuccessfullyUploadArtObject({
             variant="secondary"
             onClick={() => {
               setModalShow(false);
+              navigate("/profile");
             }}
           >
             Close

@@ -1,11 +1,11 @@
 import { NavLink } from "react-router";
 import "./NavigationBar.css";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function NavigationBar() {
-  const { logout, isAuthenticated, user, loading } = useContext(AuthContext);
+  const { logout, isAuthenticated, user } = useContext(AuthContext);
 
   const handleSignOut = () => {
     logout();

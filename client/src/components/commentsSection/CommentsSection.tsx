@@ -1,6 +1,6 @@
 import { FormEvent, useContext, useEffect, useState } from "react";
 import "./CommentSection.css";
-import { Button, Form } from "react-bootstrap";
+import { Alert, Button, Form } from "react-bootstrap";
 import { CommentsResponce } from "../../types/customType";
 import { AuthContext } from "../../context/AuthContext";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -13,13 +13,13 @@ type CommentsSectionProps = {
   artditail: string;
 };
 function CommentsSection({ artditail }: CommentsSectionProps) {
-  console.log("CommentsSection Component");
   const { user } = useContext(AuthContext);
   const [comments, setComments] = useState<CommentsResponce[]>([]);
   const [newComment, setNewComment] = useState("");
   //two varriables below for changing comment
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [alert, setAlert] = useState(false);
 
   const handleEditButtonClick = (commentId: string, currentText: string) => {
     setEditingCommentId(commentId);
@@ -29,7 +29,6 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
   const handleUpdateComment = async (commentId: string) => {
     try {
       const token = localStorage.getItem("token");
-      console.log("editText :>> ", editText);
       if (editText.trim()) {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -49,7 +48,6 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
           requestOptions
         );
         if (response.ok) {
-          console.log("response.ok");
           setEditingCommentId(null);
           getAllComentsForArtObject();
         }
@@ -63,13 +61,8 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
 
   const getAllComentsForArtObject = async () => {
     try {
-      const myHeaders = new Headers();
-      const token = localStorage.getItem("token");
-      myHeaders.append("Authorization", `Bearer ${token}`);
-
       const requestOptions = {
         method: "GET",
-        headers: myHeaders,
       };
 
       const response = await fetch(
@@ -79,7 +72,6 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
       if (response.ok) {
         const result = await response.json();
         setComments(result.comments);
-        console.log("result :>> ", result.comments);
       } else {
         console.log("there are any comments for this art object ");
       }
@@ -97,6 +89,13 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
 
   const handleCommentSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    setAlert(false);
+
+    if (!user.userId) {
+      setNewComment("");
+      setAlert(true);
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
 
@@ -120,8 +119,6 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
         );
         if (response.ok) {
           const result = await response.json();
-          console.log("result from server add new comment :>> ", result);
-          //setComments([...comments, newComment]);
           const newUserComment: CommentsResponce = {
             artId: result.artId,
             text: result.text,
@@ -132,7 +129,6 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
             commentId: result.commentId,
             updatedAt: result.createdAt,
           };
-          console.log("newUserComment :>> ", newUserComment);
           setComments([...comments, newUserComment]);
           setNewComment("");
         }
@@ -145,7 +141,6 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    console.log("commentId :>> ", commentId);
     const token = localStorage.getItem("token");
     try {
       const myHeaders = new Headers();
@@ -164,8 +159,7 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
         requestOptions
       );
       if (response.ok) {
-        const resolt = await response.json();
-        console.log("resolt delete operation:>> ", resolt);
+        //const resolt = await response.json();
         getAllComentsForArtObject();
       }
     } catch (error) {
@@ -176,6 +170,17 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
   return (
     <div className="comments-section">
       <h3>Comments</h3>
+      {alert && (
+        <Alert
+          variant={"primary"}
+          style={{
+            width: "80%",
+            margin: "2rem auto",
+          }}
+        >
+          {"To leave a comment, you need to rogin"}
+        </Alert>
+      )}
       <Form onSubmit={handleCommentSubmit}>
         <Form.Group className="mb-3" controlId="commentText">
           <Form.Label>Write a Comment</Form.Label>
@@ -206,9 +211,11 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
                     <AccountCircle fontSize="large" sx={{ color: "#66ccff" }} />
                   )}
                 </div>
-                {/* <p>By {comment.userName}</p> */}
+
                 <span className="comment-username fw-bold">
-                  {comment.userName}
+                  {user.userId === comment.userId
+                    ? "You wrote this comment"
+                    : comment.userName}
                 </span>
               </div>
               <p className="comment-date text-muted">

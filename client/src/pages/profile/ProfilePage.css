@@ -9,12 +9,47 @@
 .container-with-arts-objects-of-user {
   width: 70%;
 }
-.custom-button {
+.custom-button-posted-art {
   color: "black";
 }
 
-.custom-button:hover svg {
+.custom-button-posted-art:hover svg {
   color: green;
+}
+
+.user-info-section {
+  background-color: #f3fdf5;
+  border: 1px solid #d4edd9;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+/* Custom button style for NavLink */
+.custom-button-user-info {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background-color: #a9cea9; /* Mint green */
+  border: 2px solid #93d193;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  width: 200px;
+}
+
+.custom-button-user-info:hover,
+.custom-button-user-info:active,
+.custom-button-user-info:focus {
+  background-color: #4cae4c;
+  border-color: #398439;
 }
 
 .favorites-section,
@@ -65,9 +100,3 @@
   font-size: 0.9em;
   color: #777;
 }
-
-/* .masonry-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s, box-shadow 0.3s;
-} */

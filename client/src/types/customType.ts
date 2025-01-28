@@ -28,7 +28,7 @@ export type LoginOkResponse = {
 }
 
 export type GetProfileOkResponse = {
-    userProfile: User;
+    userProfile: ExistingUserInDB;
 }
 
 export interface ArtsObjectResponce {

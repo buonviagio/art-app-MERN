@@ -18,15 +18,21 @@ const app = express();
 
 
 const addMiddlewares = () => {
+    //Parses incoming JSON requests and makes the parsed data available in req.body.
     app.use(express.json());
+    //Parses incoming URL-encoded data (from HTML forms) and makes it available in req.body
+    //Essential for APIs that receive JSON data in the request body, such as POST or PUT requests.
     app.use(
         express.urlencoded({
             extended: true,
         })
     );
+    //CORS allows your API to handle requests from different origins (domains, ports, or protocols)
     app.use(cors());
+    // A service for managing images and videos.
     cloudinaryConfig();
     passport.initialize();
+    //Registers a specific Passport strategy (JwtStrategy)
     passport.use(passportStrategy);
 }
 
@@ -38,10 +44,6 @@ const DBConnection = async () => {
         console.log('error connecting to the MongoDB :>> ', error);
     }
 }
-/* mongoose
-    .connect(process.env.MONGO_URI)
-    .then(() => console.log("Connection to Mongo DB established"))
-    .catch((err) => console.log("ERROR FROM CATCH " + err)); */
 
 const startServer = () => {
     const port = process.env.PORT || 5000;

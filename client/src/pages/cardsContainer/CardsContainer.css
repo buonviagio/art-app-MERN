@@ -16,7 +16,57 @@
 
 .custom-card:hover {
   /*card goes up when hovering*/
-  transform: translateY(-5px);
+  transform: translateY(-3px);
   /* to make shadow stronger*/
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+/* Custom block container */
+.custom-block {
+  background-color: #f3fdf5;
+  border: 1px solid #d4edd9;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+/* Dropdown styling  */
+.custom-dropdown {
+  border: 1px solid #b6dbb6;
+  border-radius: 4px;
+  padding: 5px;
+  /* Light mint dropdown background */
+  background-color: #f9fcf9;
+}
+
+/* Button for favorites */
+.favorite-button {
+  position: absolute;
+  bottom: -70px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.favorite-button:hover {
+  transform: scale(1.1);
+}
+
+/* Custom card for artifacts */
+.custom-card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-img {
+  border-radius: 8px 8px 0 0;
+  transition: transform 0.3s ease;
+}
+
+/* .custom-img:hover {
+  transform: scale(1.05);
+} */

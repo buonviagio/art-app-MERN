@@ -12,7 +12,10 @@ import {
     updateArtObject,
     getArtByID,
     getArtObjectsBasedOnUserLikes,
-    getArtObjectsMostCommented
+    getArtObjectsMostCommented,
+    getArtObjectsDescendingSequence,
+    getArtObjectsAscendingSequence,
+    getArtObjectsByItsName
 } from "../controller/artsController.js";
 import multerUpload from "../middlewares/multer.js";
 import jwtAuth from "../middlewares/jwtAuth.js";
@@ -40,10 +43,16 @@ artsRouter.get("/getAllFavoritesForProfilePage", jwtAuth, getAllFavoriteArtObjec
 //updating art object
 artsRouter.post("/updateArtObject", jwtAuth, multerUpload.single("artphoto"), updateArtObject);
 //get art object by ID
-artsRouter.get("/:id", jwtAuth, getArtByID);
+artsRouter.get("/:id", getArtByID);
 //get art objects based on user's likes
 artsRouter.get("/artObjects/favorited", getArtObjectsBasedOnUserLikes);
 //get art objects with the most comments
 artsRouter.get("/artObjects/commented", getArtObjectsMostCommented);
+//get art object descending sequence
+artsRouter.get("/artObjects/newest", getArtObjectsDescendingSequence);
+//get art object ascending sequence
+artsRouter.get("/artObjects/oldest", getArtObjectsAscendingSequence);
+//get art object by the name of painting
+artsRouter.get("/artObjects/:nameOfArt", getArtObjectsByItsName);
 
 export default artsRouter;  
