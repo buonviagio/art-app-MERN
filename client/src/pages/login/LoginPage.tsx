@@ -3,6 +3,7 @@ import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import { LoginOkResponse } from "../../types/customType";
 import { Alert, Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { AuthContext } from "../../context/AuthContext";
+import { baseURL } from "../../utils/baseURL";
 
 export default function LoginPage() {
   const { login } = useContext(AuthContext);
@@ -53,10 +54,7 @@ export default function LoginPage() {
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/user/login",
-        requestOptions
-      );
+      const response = await fetch(`${baseURL}/api/user/login`, requestOptions);
 
       const result = (await response.json()) as LoginOkResponse;
 

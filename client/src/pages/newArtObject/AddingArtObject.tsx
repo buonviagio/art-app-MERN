@@ -13,6 +13,7 @@ import ModalForSuccessfullyUploadArtObject from "../../components/modalWindows/M
 import { FaBackspace } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import "./AddindArtObject.css";
+import { baseURL } from "../../utils/baseURL";
 
 export default function AddingArtObject() {
   const [modalShow, setModalShow] = useState(false);
@@ -100,7 +101,7 @@ export default function AddingArtObject() {
     }, 30); */
     try {
       const response = await fetch(
-        "http://localhost:5000/api/arts/aploadArtObject",
+        `${baseURL}/api/arts/aploadArtObject`,
         requestOptions
       );
 

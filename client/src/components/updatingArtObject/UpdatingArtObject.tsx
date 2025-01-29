@@ -6,6 +6,7 @@ import * as yup from "yup";
 import ModalForSuccessfullyUploadArtObject from "../modalWindows/ModalForSuccessfullyUploadArtObject";
 import { useLocation, useNavigate } from "react-router";
 import { FaBackspace } from "react-icons/fa";
+import { baseURL } from "../../utils/baseURL";
 
 export default function UpdatingArtObject() {
   const [returnedArtObject, setReturnedArtObject] = useState<{
@@ -111,7 +112,7 @@ export default function UpdatingArtObject() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/arts/updateArtObject",
+        `${baseURL}/api/arts/updateArtObject`,
         requestOptions
       );
 

@@ -29,6 +29,14 @@
   padding: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.custom-block-item {
+  margin: 2%;
 }
 
 /* Dropdown styling  */

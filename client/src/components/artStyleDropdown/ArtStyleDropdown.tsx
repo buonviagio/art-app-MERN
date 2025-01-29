@@ -2,10 +2,17 @@ import { Dropdown } from "react-bootstrap";
 import { Dispatch, SetStateAction, useState } from "react";
 import "./ArtStyleDropDropdown.css";
 import { ArtsObjectResponce } from "../../types/customType";
+import { baseURL } from "../../utils/baseURL";
 type ArtStyleDropdownProps = {
   setAllArtifacts: Dispatch<SetStateAction<ArtsObjectResponce[] | null>>;
+  setAlertMessage: Dispatch<SetStateAction<string>>;
+  setAlert: Dispatch<SetStateAction<boolean>>;
 };
-const ArtStyleDropdown = ({ setAllArtifacts }: ArtStyleDropdownProps) => {
+const ArtStyleDropdown = ({
+  setAllArtifacts,
+  setAlertMessage,
+  setAlert,
+}: ArtStyleDropdownProps) => {
   const [selectedStyle, setSelectedStyle] = useState("Select an art style");
 
   const artStyles = [
@@ -39,6 +46,7 @@ const ArtStyleDropdown = ({ setAllArtifacts }: ArtStyleDropdownProps) => {
   ];
 
   const handleSelect = async (style: string) => {
+    setAlert(false);
     setSelectedStyle(style);
     try {
       const requestOptions = {
@@ -46,12 +54,21 @@ const ArtStyleDropdown = ({ setAllArtifacts }: ArtStyleDropdownProps) => {
       };
 
       const response = await fetch(
-        `http://localhost:5000/api/arts/all/${style}`,
+        `${baseURL}/api/arts/all/${style}`,
         requestOptions
       );
       if (response.ok) {
         const result = await response.json();
-        setAllArtifacts(result.desiredArt);
+        if (result.desiredArt.length !== 0) {
+          setAllArtifacts(result.desiredArt);
+        } else {
+          setAlertMessage(
+            result.message +
+              " you can be the first, who will post art object in this style"
+          );
+          setAlert(true);
+          setAllArtifacts(result.desiredArt);
+        }
       }
     } catch (error) {
       console.log("error, we can show art objects desired style :>> ", error);

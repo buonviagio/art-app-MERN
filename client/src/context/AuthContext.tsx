@@ -2,6 +2,7 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import { ExistingUserInDB } from "../types/customType";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router";
+import { baseURL } from "../utils/baseURL";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -76,7 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           };
 
           const result = await fetch(
-            "http://localhost:5000/api/user/profile",
+            `${baseURL}/api/user/profile`,
             requestOptions
           );
           console.log("3!");

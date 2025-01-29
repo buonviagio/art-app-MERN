@@ -8,6 +8,7 @@ import CarouseForFavoritesl from "../../components/carouselForFavoriteArtObjects
 import { AuthContext } from "../../context/AuthContext";
 import Masonry from "react-masonry-css";
 import { NavLink, useNavigate } from "react-router";
+import { baseURL } from "../../utils/baseURL";
 
 export default function ProfilePage() {
   const { user, setUser } = useContext(AuthContext);
@@ -43,7 +44,7 @@ export default function ProfilePage() {
     };
     try {
       const response = await fetch(
-        "http://localhost:5000/api/arts/getAllFavoritesForProfilePage",
+        `${baseURL}/api/arts/getAllFavoritesForProfilePage`,
         requestOptions
       );
       if (response.ok) {
@@ -75,7 +76,7 @@ export default function ProfilePage() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/arts/addtofavorite",
+        `${baseURL}/api/arts/addtofavorite`,
         requestOptions
       );
       if (response.ok) {
@@ -112,7 +113,7 @@ export default function ProfilePage() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/arts/deleteArtObject",
+        `${baseURL}/api/arts/deleteArtObject`,
         requestOptions
       );
 
@@ -151,7 +152,7 @@ export default function ProfilePage() {
     };
     try {
       const response = await fetch(
-        "http://localhost:5000/api/user/avatarUpload",
+        `${baseURL}/api/user/avatarUpload`,
         requestOptions
       );
       if (!response.ok) {
@@ -183,7 +184,7 @@ export default function ProfilePage() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/arts/allUserArts",
+        `${baseURL}/api/arts/allUserArts`,
         requestOptions
       );
       if (response.ok) {

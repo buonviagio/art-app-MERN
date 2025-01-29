@@ -8,6 +8,7 @@ import { AccountCircle } from "@mui/icons-material";
 import { GoPencil } from "react-icons/go";
 import { MdOutlineCancel } from "react-icons/md";
 import { GrUpdate } from "react-icons/gr";
+import { baseURL } from "../../utils/baseURL";
 
 type CommentsSectionProps = {
   artditail: string;
@@ -44,7 +45,7 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
         };
 
         const response = await fetch(
-          `http://localhost:5000/api/comments/change/${commentId}`,
+          `${baseURL}/api/comments/change/${commentId}`,
           requestOptions
         );
         if (response.ok) {
@@ -66,7 +67,7 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
       };
 
       const response = await fetch(
-        `http://localhost:5000/api/comments/${artditail}`,
+        `${baseURL}/api/comments/${artditail}`,
         requestOptions
       );
       if (response.ok) {
@@ -114,7 +115,7 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
         };
 
         const response = await fetch(
-          `http://localhost:5000/api/comments/${artditail}`,
+          `${baseURL}/api/comments/${artditail}`,
           requestOptions
         );
         if (response.ok) {
@@ -155,7 +156,7 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
       };
 
       const response = await fetch(
-        `http://localhost:5000/api/comments/delete/${commentId}`,
+        `${baseURL}/api/comments/delete/${commentId}`,
         requestOptions
       );
       if (response.ok) {

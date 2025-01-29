@@ -2,11 +2,13 @@ import { Dropdown } from "react-bootstrap";
 import { Dispatch, SetStateAction, useState } from "react";
 import "./ArtSelection.css";
 import { ArtsObjectResponce } from "../../types/customType";
+import { baseURL } from "../../utils/baseURL";
 
 type ArtSelectionProps = {
   setAllArtifacts: Dispatch<SetStateAction<ArtsObjectResponce[] | null>>;
+  setAlert: Dispatch<SetStateAction<boolean>>;
 };
-const ArtSelection = ({ setAllArtifacts }: ArtSelectionProps) => {
+const ArtSelection = ({ setAllArtifacts, setAlert }: ArtSelectionProps) => {
   const [selectedOption, setSelectedOption] = useState("Sorting by");
 
   const options = [
@@ -17,6 +19,7 @@ const ArtSelection = ({ setAllArtifacts }: ArtSelectionProps) => {
   ];
 
   const handleSelect = async (value: string | null) => {
+    setAlert(false);
     const selected = options.find((option) => option.value === value);
     if (selected) setSelectedOption(selected.name);
     console.log("selected :>> ", value);
@@ -27,7 +30,7 @@ const ArtSelection = ({ setAllArtifacts }: ArtSelectionProps) => {
 
       if (value === "commented") {
         const response = await fetch(
-          `http://localhost:5000/api/arts/artObjects/${value}`,
+          `${baseURL}/api/arts/artObjects/${value}`,
           requestOptions
         );
         if (response.ok) {
@@ -36,7 +39,7 @@ const ArtSelection = ({ setAllArtifacts }: ArtSelectionProps) => {
         }
       } else if (value === "favorited") {
         const response = await fetch(
-          `http://localhost:5000/api/arts/artObjects/${value}`,
+          `${baseURL}/api/arts/artObjects/${value}`,
           requestOptions
         );
         if (response.ok) {
@@ -45,7 +48,7 @@ const ArtSelection = ({ setAllArtifacts }: ArtSelectionProps) => {
         }
       } else if (value === "newest") {
         const response = await fetch(
-          `http://localhost:5000/api/arts/artObjects/${value}`,
+          `${baseURL}/api/arts/artObjects/${value}`,
           requestOptions
         );
         if (response.ok) {
@@ -54,7 +57,7 @@ const ArtSelection = ({ setAllArtifacts }: ArtSelectionProps) => {
         }
       } else if (value === "oldest") {
         const response = await fetch(
-          `http://localhost:5000/api/arts/artObjects/${value}`,
+          `${baseURL}/api/arts/artObjects/${value}`,
           requestOptions
         );
         if (response.ok) {

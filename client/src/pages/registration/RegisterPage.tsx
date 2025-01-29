@@ -5,6 +5,7 @@ import { Alert, Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { LoginOkResponse, User } from "../../types/customType";
 import { NavLink, useNavigate } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
+import { baseURL } from "../../utils/baseURL";
 
 export default function RegisterPage() {
   // to think about tipe File |String
@@ -72,7 +73,7 @@ export default function RegisterPage() {
     };
     try {
       const request = await fetch(
-        "http://localhost:5000/api/user/register",
+        `${baseURL}/api/user/register`,
         requestOptions
       );
 
@@ -110,10 +111,7 @@ export default function RegisterPage() {
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/user/login",
-        requestOptions
-      );
+      const response = await fetch(`${baseURL}/api/user/login`, requestOptions);
 
       const result = (await response.json()) as LoginOkResponse;
       if (result.token) {

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
+import { Alert, Container } from "react-bootstrap";
 import "./CardsContainer.css";
 import { useNavigate } from "react-router";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
@@ -10,9 +10,9 @@ import ArtStyleDropdown from "../../components/artStyleDropdown/ArtStyleDropdown
 import ArtSearch from "../../components/artSearching/ArtSearch";
 import Masonry from "react-masonry-css";
 import ImageSkeleton from "../../components/imageSkeleton/ImageSkeleton";
+import { baseURL } from "../../utils/baseURL";
 
 export default function CardsContainer() {
-  console.log("CardsContainer component");
   const { isAuthenticated } = useContext(AuthContext);
   const [allArtifacts, setAllArtifacts] = useState<ArtsObjectResponce[] | null>(
     null
@@ -20,6 +20,8 @@ export default function CardsContainer() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const navigate = useNavigate();
   const [goTotheCart, setGoTotheCart] = useState(false);
+  const [alert, setAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const breakpointColumnsObj = {
     default: 3,
     1100: 2,
@@ -43,7 +45,7 @@ export default function CardsContainer() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/arts/addtofavorite",
+        `${baseURL}/api/arts/addtofavorite`,
         requestOptions
       );
       if (response.ok) {
@@ -64,10 +66,7 @@ export default function CardsContainer() {
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/arts/all",
-        requestOptions
-      );
+      const response = await fetch(`${baseURL}/api/arts/all`, requestOptions);
       if (response.ok) {
         const result = await response.json();
         setAllArtifacts(result.allArts);
@@ -91,7 +90,7 @@ export default function CardsContainer() {
     };
     try {
       const response = await fetch(
-        "http://localhost:5000/api/arts/getAllFavorites",
+        `${baseURL}/api/arts/getAllFavorites`,
         requestOptions
       );
       if (response.ok) {
@@ -117,6 +116,7 @@ export default function CardsContainer() {
   }, [goTotheCart]);
 
   useEffect(() => {
+    setAlert(false);
     getAllArtifacts();
   }, []);
 
@@ -134,17 +134,38 @@ export default function CardsContainer() {
   return (
     <Container fluid className="my-4 px-4">
       {/* Styling block */}
-      <Row className="justify-content-center text-center custom-block">
-        <Col xs={12} md={4} className="mb-3 mb-md-0">
-          <ArtSelection setAllArtifacts={setAllArtifacts} />
-        </Col>
-        <Col xs={12} md={4} className="mb-3 mb-md-0">
-          <ArtSearch setAllArtifacts={setAllArtifacts} />
-        </Col>
-        <Col xs={12} md={4} className="mb-3 mb-md-0">
-          <ArtStyleDropdown setAllArtifacts={setAllArtifacts} />
-        </Col>
-      </Row>
+      <div className="custom-block">
+        <div className="custom-block-item">
+          <ArtSelection setAllArtifacts={setAllArtifacts} setAlert={setAlert} />
+        </div>
+        <div className="custom-block-item">
+          <ArtSearch
+            setAllArtifacts={setAllArtifacts}
+            setAlertMessage={setAlertMessage}
+            setAlert={setAlert}
+          />
+        </div>
+        <div className="custom-block-item">
+          <ArtStyleDropdown
+            setAllArtifacts={setAllArtifacts}
+            setAlertMessage={setAlertMessage}
+            setAlert={setAlert}
+          />
+        </div>
+      </div>
+
+      {/* Alert Section */}
+      {alert && (
+        <Alert
+          variant={"info"}
+          style={{
+            width: "80%",
+            margin: "2rem auto",
+          }}
+        >
+          {alertMessage}
+        </Alert>
+      )}
 
       {/* Artifacts with Masonry*/}
       <Masonry

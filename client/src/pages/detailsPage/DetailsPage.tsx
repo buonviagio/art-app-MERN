@@ -4,6 +4,7 @@ import { ArtsObjectResponce } from "../../types/customType";
 import { useEffect, useState } from "react";
 import CommentsSection from "../../components/commentsSection/CommentsSection";
 import "./DetailsPage.css";
+import { baseURL } from "../../utils/baseURL";
 
 export default function DetailsPage() {
   const { artditail } = useParams();
@@ -20,7 +21,7 @@ export default function DetailsPage() {
         method: "GET",
       };
       const response = await fetch(
-        `http://localhost:5000/api/arts/${artditail}`,
+        `${baseURL}/api/arts/${artditail}`,
         requestOptions
       );
       if (response.ok) {

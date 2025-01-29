@@ -6,7 +6,7 @@ import { pictureDelete } from "../utils/pictureDelete.js";
 import { request } from "http";
 
 const getAllArts = async (request, response) => {
-    console.log("getAllArts Method");
+
     try {
         const allArts = await ArtsModel.find({});
         // recieve arts object in random sequence 
@@ -50,10 +50,18 @@ const getArtByStyle = async (request, response) => {
     try {
         if (style !== "All styles") {
             const desiredArt = await ArtsModel.find({ style: style })
-            return response.status(200).json({
-                message: `this is what you are looking for`,
-                desiredArt
-            })
+
+            if (desiredArt.length !== 0) {
+                return response.status(200).json({
+                    message: `this is what you are looking for`,
+                    desiredArt
+                })
+            } else {
+                return response.status(200).json({
+                    message: `we can not find art objects in style ${style}`,
+                    desiredArt
+                })
+            }
         } else if (style === "All styles") {
             const desiredArt = await ArtsModel.find({});
             return response.status(200).json({
@@ -95,7 +103,6 @@ const uploadArtObject = async (request, response) => {
         let artObject;
         try {
             artObject = await ArtsModel.create(artData);
-            console.log('artObject :>> ', artObject);
         } catch (error) {
             console.log("Error creating art object:", error);
         }
@@ -104,7 +111,6 @@ const uploadArtObject = async (request, response) => {
             const user = await UserModel.findById(userId);
             user.postedArtObjects.push(artObject._id);
             await user.save();
-            console.log('USER :>> ', user);
         } catch (error) {
             console.log("Error saving referense to the user", error);
         }
@@ -170,7 +176,7 @@ const getAllFavoriteArtObjecsOfUser = async (req, res) => {
     const userId = req.user._id;
     try {
         const user = await UserModel.findById(userId);
-        //console.log('user.favorites :>> ', user.favorites);
+
         if (!user) {
             return res.status(404).json({ message: "User not found, to get favorites" });
         } else {
@@ -186,7 +192,7 @@ const getAllFavoriteArtObjecsOfUser = async (req, res) => {
 
 const getAllFavoriteArtObjecsOfUserForProfilePage = async (req, res) => {
     const userId = req.user._id;
-    console.log('User ID from  getAllFavoriteArtObjecsOfUserForProfilePage:>> ', userId);
+
     try {
         // Find the user by ID and populate the `favorites` field
         const user = await UserModel.findById(userId).populate({
@@ -223,7 +229,7 @@ const deleteArtObject = async (req, res) => {
         // St2 Before saving the avatar picture we have to delete the previous one, if does it exist
         const publicIdOfThePicture = artObject.picture.public_id;
         if (publicIdOfThePicture) {
-            console.log("PICTURE WAS DELETED");
+
             await pictureDelete(publicIdOfThePicture);
         }
 
@@ -342,7 +348,7 @@ const getArtObjectsBasedOnUserLikes = async (request, response) => {
 }
 
 const getArtObjectsMostCommented = async (request, response) => {
-    console.log("getArtObjectsMostCommented method");
+
     try {
         // Step 1: Populate the 'art' field to get the comments
         // Using lean() to convert to plain js
@@ -410,10 +416,18 @@ const getArtObjectsByItsName = async (request, response) => {
     try {
         if (nameOfArt) {
             const desiredArt = await ArtsModel.find({ nameOfThePainting: { $regex: nameOfArt, $options: 'i' } })
-            return response.status(200).json({
-                message: `this is what you are looking for`,
-                desiredArt
-            })
+
+            if (desiredArt.length !== 0) {
+                return response.status(200).json({
+                    message: "this is what you are looking for",
+                    desiredArt
+                })
+            } else {
+                return response.status(200).json({
+                    message: `We can not find desired art object with the name ${nameOfArt}`,
+                    desiredArt
+                })
+            }
         }
     } catch (error) {
         console.log('error getArtObjectsByItsName :>> ', error);
