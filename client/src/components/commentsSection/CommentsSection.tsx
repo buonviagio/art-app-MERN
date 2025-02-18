@@ -197,7 +197,7 @@ function CommentsSection({ artditail }: CommentsSectionProps) {
         </Button>
       </Form>
       <div className="comments-list mt-4">
-        {comments.length ? (
+        {comments && comments.length ? (
           comments.map((comment, index) => (
             <div key={index} className="comment-item">
               <div className="comment-header d-flex align-items-center">
