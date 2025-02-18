@@ -55,7 +55,7 @@ export default function DetailsPage() {
     if (artditail) {
       fetchArtDetails();
     }
-  }, [artditail]);
+  }, []);
 
   return (
     <div className="container mt-4">
