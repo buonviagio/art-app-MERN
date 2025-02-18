@@ -73,7 +73,7 @@ export default function DetailsPage() {
       <div className="row">
         {/* Artwork Image */}
         <div className="col-md-6">
-          {loading ? (
+          {/*           {loading ? (
             <div
               style={{ height: "300px", width: "100%", background: "#959697" }}
             ></div>
@@ -83,6 +83,19 @@ export default function DetailsPage() {
               alt={artDetails?.nameOfThePainting}
               className="img-fluid rounded"
             />
+          )} */}
+          {loading ? (
+            <div
+              style={{ height: "300px", width: "100%", background: "#959697" }}
+            ></div>
+          ) : artDetails && artDetails.picture ? (
+            <img
+              src={artDetails.picture.secure_url}
+              alt={artDetails.nameOfThePainting ?? "Unknown Painting"}
+              className="img-fluid rounded"
+            />
+          ) : (
+            <p>Image not available</p>
           )}
         </div>
 
