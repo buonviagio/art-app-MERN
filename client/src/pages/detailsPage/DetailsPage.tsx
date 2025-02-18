@@ -6,7 +6,6 @@ import CommentsSection from "../../components/commentsSection/CommentsSection";
 import "./DetailsPage.css";
 import { baseURL } from "../../utils/baseURL";
 import Placeholder from "react-bootstrap/esm/Placeholder";
-import { Card } from "react-bootstrap";
 
 export default function DetailsPage() {
   const { artditail } = useParams();
@@ -29,8 +28,18 @@ export default function DetailsPage() {
         `${baseURL}/api/arts/${artditail}`,
         requestOptions
       );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch art details: ${response.status}`);
+      }
+
       if (response.ok) {
         const result = await response.json();
+        console.log("result :>> ", result);
+        if (!result || !result.desiredArt) {
+          throw new Error("Invalid API response: desiredArt is missing");
+        }
+
         setArtDetails(result.desiredArt);
       } else {
         console.error("Failed to fetch art details");
