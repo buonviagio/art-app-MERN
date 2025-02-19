@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import CommentsSection from "../../components/commentsSection/CommentsSection";
 import "./DetailsPage.css";
 import { baseURL } from "../../utils/baseURL";
-import Placeholder from "react-bootstrap/esm/Placeholder";
+import { Placeholder } from "react-bootstrap";
 
 export default function DetailsPage() {
   const { artditail } = useParams();
@@ -29,17 +29,8 @@ export default function DetailsPage() {
         requestOptions
       );
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch art details: ${response.status}`);
-      }
-
       if (response.ok) {
         const result = await response.json();
-        console.log("result :>> ", result);
-        if (!result || !result.desiredArt) {
-          throw new Error("Invalid API response: desiredArt is missing");
-        }
-
         setArtDetails(result.desiredArt);
       } else {
         console.error("Failed to fetch art details");
@@ -47,7 +38,10 @@ export default function DetailsPage() {
     } catch (error) {
       console.error("Error fetching art details:", error);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+      //setLoading(false);
       console.log("LOADER FALSE:>> ");
     }
   };
@@ -86,7 +80,12 @@ export default function DetailsPage() {
           )} */}
           {loading ? (
             <div
-              style={{ height: "300px", width: "100%", background: "#959697" }}
+              style={{
+                height: "300px",
+                width: "100%",
+                background: "#959697",
+                borderRadius: "10px",
+              }}
             ></div>
           ) : artDetails && artDetails.picture ? (
             <img
@@ -102,24 +101,24 @@ export default function DetailsPage() {
         {/* Artwork Details */}
         {loading ? (
           <div className="col-md-6">
-            <Placeholder xs={12} bg="secondary" />
+            <Placeholder xs={12} bg="primary" />
             <Placeholder xs={4} size="sm" />
             <p>
-              <strong>Style:</strong> <Placeholder xs={4} animation="glow" />
+              <strong>Style:</strong> <Placeholder xs={4} />
             </p>
             <p>
-              <strong>Year:</strong> <Placeholder xs={2} animation="glow" />
+              <strong>Year:</strong> <Placeholder xs={2} />
             </p>
             <p>
-              <strong>Location:</strong> <Placeholder xs={4} animation="glow" />
+              <strong>Location:</strong> <Placeholder xs={4} />
             </p>
             <p>
               <strong>Description:</strong>
-              <Placeholder xs={12} size="sm" animation="glow" />
-              <Placeholder xs={12} size="sm" animation="glow" />
-              <Placeholder xs={12} size="sm" animation="glow" />
-              <Placeholder xs={12} size="sm" animation="glow" />
-              <Placeholder xs={12} size="sm" animation="glow" />
+              <Placeholder xs={12} size="sm" />
+              <Placeholder xs={12} size="sm" />
+              <Placeholder xs={12} size="sm" />
+              <Placeholder xs={12} size="sm" />
+              <Placeholder xs={12} size="sm" />
             </p>
           </div>
         ) : (
