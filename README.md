@@ -10,7 +10,8 @@ Other users can **view posts and leave comments** to engage in discussions about
 
 ### **Frontend (Client-Side)**
 🚀 **React.js (TypeScript)** – Builds the interactive UI  
-🎨 **Material UI (MUI)** – Pre-styled UI components  
+🎨 **Bootstrap** – Provides responsive and modern UI components  
+📐 **Masonry Layout** – Organizes posts in a visually appealing grid 
 
 ### **Backend (Server-Side)**
 ⚙️ **Node.js + Express (TypeScript)** – Handles API requests  
